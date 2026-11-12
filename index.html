@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CARE Egypt Foundation - Performance Appraisal Hub</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        care: '#C51B27' /* CARE Red */
+                    }
+                }
+            }
+        }
+    </script>
+<!-- html2canvas + jsPDF CDN (used directly by exportToPDF for multi-page export) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        .active-tab {
+            border-color: #C51B27;
+            color: #C51B27;
+            font-weight: 600;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <img src="data:image/png;base64,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" alt="CARE Egypt Foundation" class="h-10 w-auto object-contain">
+                <div>
+                    <h1 class="font-bold text-lg text-slate-900">Performance Appraisal & Strategic Goal Hub</h1>
+                    <p class="text-xs text-slate-500">FY 2025-2026 • تقييم الأداء السنوي ومواءمة الأهداف المستقبلية ٢٥-٢٦</p>
+                </div>
+            </div>
+            
+            <!-- Tab Navigation -->
+            <nav class="flex gap-2 bg-slate-100 p-1 rounded-xl">
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="px-4 py-2 text-xs md:text-sm rounded-lg font-medium transition-all duration-200 active-tab bg-white shadow-sm flex items-center gap-2">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                </button>
+                <button onclick="switchTab('simulator')" id="btn-simulator" class="px-4 py-2 text-xs md:text-sm rounded-lg font-medium transition-all duration-200 text-slate-600 hover:text-slate-900 flex items-center gap-2">
+                    <i data-lucide="sliders" class="w-4 h-4"></i> FY-25/26 Appraisal
+                </button>
+                <button onclick="switchTab('objectives')" id="btn-objectives" class="px-4 py-2 text-xs md:text-sm rounded-lg font-medium transition-all duration-200 text-slate-600 hover:text-slate-900 flex items-center gap-2">
+                    <i data-lucide="target" class="w-4 h-4"></i> Future Goals
+                </button>
+            </nav>
+
+            <div class="flex flex-col items-center sm:items-end gap-1.5">
+                <div class="flex items-center justify-center sm:justify-end">
+                    <button onclick="clearAllData()" class="px-5 py-3 text-sm md:text-base rounded-lg font-bold border-2 border-red-300 text-red-700 hover:text-white hover:bg-red-600 hover:border-red-600 transition-all duration-200 flex items-center gap-2 shadow-sm">
+                        <i data-lucide="eraser" class="w-5 h-5"></i> Clear All Data
+                    </button>
+                </div>
+                <div class="flex flex-col items-center sm:items-end gap-1">
+                    <button onclick="exportToCSV()" class="px-4 py-2 text-xs md:text-sm rounded-lg font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all duration-200 flex items-center gap-2 shadow-sm">
+                        <i data-lucide="sheet" class="w-4 h-4"></i> Download PA Data (CSV)
+                    </button>
+                    <span class="text-[10px] text-slate-400 text-center sm:text-right leading-tight max-w-[230px]">Click to download once the appraisal is complete<br><span dir="rtl">انقر للتنزيل بعد اكتمال التقييم</span></span>
+                </div>
+                <span id="autosave-status" class="text-[10px] text-slate-400">Auto-saved to this device</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- ==================== TAB 1: DASHBOARD & VISUALIZATIONS ==================== -->
+        <section id="tab-dashboard" class="space-y-8">
+            <!-- Employee Profile & Manager Card -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col gap-6">
+                <!-- Employee Row -->
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Employee Information / بيانات الموظف</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-x-8 gap-y-4 w-full">
+                        <div>
+                            <span class="text-xs text-slate-400 block">EMPLOYEE / الموظف</span>
+                            <input type="text" id="prof-name" class="w-full font-semibold text-slate-800 bg-transparent border-b border-dashed border-slate-300 focus:border-red-500 focus:outline-none" value="">
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 block">ROLE / المسمى الوظيفي</span>
+                            <input type="text" id="prof-role" class="w-full font-semibold text-slate-800 bg-transparent border-b border-dashed border-slate-300 focus:border-red-500 focus:outline-none" value="">
+                        </div>
+                        <div>
+                            <!-- Edit 1: Replaced with interactive dropdown from spreadsheet departments -->
+                            <span class="text-xs text-slate-400 block">DEPARTMENT / الإدارة</span>
+                            <select id="prof-dept" onchange="filterObjectivesDB()" class="w-full font-semibold text-slate-800 bg-transparent border-b border-dashed border-slate-300 focus:border-red-500 focus:outline-none cursor-pointer">
+                                <option value="Program" selected>Program / البرامج</option>
+                                <option value="HR & Admin">HR & Admin / الموارد البشرية والإدارة</option>
+                                <option value="Finance">Finance / الشؤون المالية</option>
+                                <option value="MEAL">MEAL / المتابعة والتقييم والمساءلة والتعلم</option>
+                                <option value="IT">IT / تكنولوجيا المعلومات</option>
+                                <option value="SupplyChain">Supply Chain / سلسلة الإمداد والمشتريات</option>
+                                <option value="Communication">Communication / الاتصالات</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 block">CATEGORY / الفئة الوظيفية</span>
+                            <select id="prof-cat" onchange="toggleManagerRole(); recalculateAll();" class="w-full font-semibold text-slate-800 bg-transparent border-b border-dashed border-slate-300 focus:border-red-500 focus:outline-none cursor-pointer">
+                                <option value="Manager" selected>Manager / مدير</option>
+                                <option value="Staff">Regular Staff / موظف</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 block">EMPLOYEE EMAIL / البريد الإلكتروني</span>
+                            <input type="email" id="prof-email" class="w-full font-semibold text-slate-800 bg-transparent border-b border-dashed border-slate-300 focus:border-red-500 focus:outline-none" value="">
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-slate-100">
+
+                <!-- Edit 2: Added Manager details line directly below employee info -->
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Manager Information / بيانات المدير المباشر</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4 w-full">
+                        <div>
+                            <span class="text-xs text-slate-400 block">MANAGER NAME / اسم المدير</span>
+                            <input type="text" id="mgr-name" class="w-full font-semibold text-slate-800 bg-transparent border-b border-dashed border-slate-300 focus:border-red-500 focus:outline-none" value="">
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 block">MANAGER TITLE / المسمى الوظيفي للمدير</span>
+                            <input type="text" id="mgr-role" class="w-full font-semibold text-slate-800 bg-transparent border-b border-dashed border-slate-300 focus:border-red-500 focus:outline-none" value="">
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 block">MANAGER EMAIL / البريد الإلكتروني للمدير</span>
+                            <input type="email" id="mgr-email" class="w-full font-semibold text-slate-800 bg-transparent border-b border-dashed border-slate-300 focus:border-red-500 focus:outline-none" value="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Overall Rating Card -->
+                <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-6 shadow-md flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-slate-300 font-medium">Overall Performance</span>
+                            <!-- Edit 2: Explicitly Updated Year -->
+                            <span class="bg-red-500/20 text-red-400 text-xs px-2 py-0.5 rounded-full border border-red-500/30 font-semibold">FY 25/26</span>
+                        </div>
+                        <h2 id="overall-score-display" class="text-5xl font-black mt-4">3.08</h2>
+                        <p id="overall-rating-label" class="text-emerald-400 font-medium text-sm mt-1">Partially Meets Requirements</p>
+                    </div>
+                    <div class="border-t border-slate-700/50 pt-3 mt-4">
+                        <span class="text-xs text-slate-400">Calculation is weighted based on employee category rules.</span>
+                    </div>
+                </div>
+
+                <!-- Technical Goals Score -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-semibold text-slate-400 tracking-wider uppercase">Technical Goals (50%)</span>
+                            <div class="p-1.5 bg-sky-100 text-sky-600 rounded-lg"><i data-lucide="target" class="w-4 h-4"></i></div>
+                        </div>
+                        <h3 id="goal-score-card" class="text-3xl font-bold text-slate-800 mt-4">3.60 / 5.0</h3>
+                        <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2">
+                            <div id="goal-score-progress" class="bg-sky-500 h-1.5 rounded-full" style="width: 72%"></div>
+                        </div>
+                    </div>
+                    <span class="text-xs text-slate-500 mt-3">Weight on final score: <strong class="text-slate-700">50%</strong></span>
+                </div>
+
+                <!-- Competencies Score -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-semibold text-slate-400 tracking-wider uppercase">Core Competencies</span>
+                            <div class="p-1.5 bg-amber-100 text-amber-600 rounded-lg"><i data-lucide="award" class="w-4 h-4"></i></div>
+                        </div>
+                        <h3 id="comp-score-card" class="text-3xl font-bold text-slate-800 mt-4">2.49 / 5.0</h3>
+                        <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2">
+                            <div id="comp-score-progress" class="bg-amber-500 h-1.5 rounded-full" style="width: 50%"></div>
+                        </div>
+                    </div>
+                    <span id="comp-weight-label" class="text-xs text-slate-500 mt-3">Weight on final score: <strong class="text-slate-700">25%</strong></span>
+                </div>
+
+                <!-- Managerial Score -->
+                <div id="manager-score-card-container" class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-semibold text-slate-400 tracking-wider uppercase">Manager Competencies</span>
+                            <div class="p-1.5 bg-indigo-100 text-indigo-600 rounded-lg"><i data-lucide="users" class="w-4 h-4"></i></div>
+                        </div>
+                        <h3 id="mgr-score-card" class="text-3xl font-bold text-slate-800 mt-4">2.63 / 5.0</h3>
+                        <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2">
+                            <div id="mgr-score-progress" class="bg-indigo-500 h-1.5 rounded-full" style="width: 52%"></div>
+                        </div>
+                    </div>
+                    <span id="mgr-weight-label" class="text-xs text-slate-500 mt-3">Weight on final score: <strong class="text-slate-700">25%</strong></span>
+                </div>
+            </div>
+
+            <!-- Visualization Charts & Final Summary -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Final Performance Message -->
+                <div class="lg:col-span-1 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
+                            <i data-lucide="save" class="text-red-500 w-5 h-5"></i>
+                            Save & Continue Later / الحفظ والمتابعة لاحقًا
+                        </h3>
+                        <div class="mt-4 space-y-5">
+                            <div>
+                                <button onclick="saveDataToFile()" class="w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2">
+                                    <i data-lucide="save" class="w-4 h-4"></i> Save Incomplete PA
+                                </button>
+                                <p class="text-xs text-slate-500 mt-2 text-center leading-relaxed">Download this appraisal as-is to finish it later on this or another computer.<br><span dir="rtl">قم بتنزيل التقييم كما هو حاليًا لإكماله لاحقًا على هذا الجهاز أو جهاز آخر.</span></p>
+                            </div>
+                            <div>
+                                <button onclick="triggerLoadFromFile()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2">
+                                    <i data-lucide="upload" class="w-4 h-4"></i> Continue Incomplete PA
+                                </button>
+                                <p class="text-xs text-slate-500 mt-2 text-center leading-relaxed">Upload a previously saved file to pick up right where you left off.<br><span dir="rtl">قم برفع ملف محفوظ سابقًا لمتابعة العمل من حيث توقفت.</span></p>
+                                <input type="file" id="load-data-file-input" accept="application/json,.json" class="hidden" onchange="loadDataFromFile(event)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparative Chart -->
+                <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
+                            <i data-lucide="bar-chart-3" class="text-red-500 w-5 h-5"></i>
+                            Performance Breakdown / تحليل مستويات التقييم
+                        </h3>
+                        <div class="h-64 mt-4">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="text-xs text-slate-400 mt-4 flex items-center gap-1.5 justify-end">
+                        <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400"></i> Interactive dynamic calculations are refreshed instantly upon editing.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 2: INTERACTIVE SIMULATOR (FY-25/26) ==================== -->
+        <section id="tab-simulator" class="hidden space-y-8">
+            <div class="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl flex items-start gap-3">
+                <i data-lucide="alert-circle" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+                <div>
+                    <h4 class="font-semibold text-sm">Interactive Evaluation Mode (FY 2025-2026 / العام المالي ٢٥-٢٦)</h4>
+                    <p class="text-xs">Update your self-evaluations, supervisor responses, or 360 inputs in real-time below. The system automatically recalculates final scores using official weights ($50\%$ Goals / $25\%$ core Values / $25\%$ managerial metrics).</p>
+                </div>
+            </div>
+
+            <!-- SECTION I: Goals Achievement (50% Technical) -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-lg">Section I: Goals Achievement / القسم الأول: الأهداف الفنية</h3>
+                        <p class="text-xs text-slate-400">Target Score Weight: 50% (30% Self-Evaluation, 70% Supervisor Evaluation)</p>
+                    </div>
+                    <span class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Weight: 50%</span>
+                </div>
+                
+                <div class="p-6 overflow-x-auto">
+                    <table class="w-full text-sm text-left border-collapse min-w-[700px]">
+                        <thead>
+                            <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 font-semibold">
+                                <th class="py-3 px-4 w-12">#</th>
+                                <th class="py-3 px-4">KPI / Objective - مؤشر الأداء</th>
+                                <th class="py-3 px-4 w-40">Status / الحالة</th>
+                                <th class="py-3 px-4 w-32">Self-Rating (1-5) / التقييم الذاتي</th>
+                                <th class="py-3 px-4 w-32">Supervisor (1-5) / تقييم المدير</th>
+                                <th class="py-3 px-4 w-32 text-right">Weighted Final / النتيجة الموزونة</th>
+                                <th class="py-3 px-4 w-12"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="goals-table-body">
+                            <!-- Rows loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bg-slate-50 p-4 border-t border-slate-100 flex justify-between items-center">
+                    <button onclick="addGoalRow()" class="text-xs font-bold bg-white text-slate-800 border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-100 flex items-center gap-1.5">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add New Objective
+                    </button>
+                    <div class="text-right">
+                        <span class="text-xs text-slate-500 block">Section Score:</span>
+                        <span id="goals-section-sum" class="font-bold text-slate-800 text-lg">3.60 / 5.0 (72%)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit 3: Section II Core Competencies completely refined with dual language translation on every sub-element -->
+            <!-- SECTION II: General Competencies & Values (25%) -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-lg">Section II: General Competencies & Values / القسم الثاني: الكفاءات والقيم العامة</h3>
+                        <p class="text-xs text-slate-400">Score Weight: 25% for Managers / 50% for Non-Managers (20% Self, 60% Supervisor, 20% Peer 360)</p>
+                    </div>
+                    <span id="comp-weight-tag" class="bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Weight: 25%</span>
+                </div>
+                
+                <div class="p-6 overflow-x-auto">
+                    <table class="w-full text-sm text-left border-collapse min-w-[800px]">
+                        <thead>
+                            <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 font-semibold">
+                                <th class="py-3 px-4">Value / Attribute <br><span class="text-xs font-normal text-slate-500">القيمة والصفة الجوهرية</span></th>
+                                <th class="py-3 px-4 w-1/3">Key Behaviors <br><span class="text-xs font-normal text-slate-500">السلوكيات الأساسية ومؤشرات الأداء</span></th>
+                                <th class="py-3 px-4 w-28 text-center">Self-Rating <br><span class="text-xs font-normal text-slate-500">تقييم ذاتي</span></th>
+                                <th class="py-3 px-4 w-28 text-center">Supervisor <br><span class="text-xs font-normal text-slate-500">المدير المباشر</span></th>
+                                <th class="py-3 px-4 w-28 text-center">Peer 360 <br><span class="text-xs font-normal text-slate-500">الزملاء ٣٦٠</span></th>
+                                <th class="py-3 px-4 w-28 text-right">Weighted Final <br><span class="text-xs font-normal text-slate-500">الدرجة الموزونة</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="comp-table-body">
+                            <!-- Rows dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bg-slate-50 p-4 border-t border-slate-100 text-right">
+                    <span class="text-xs text-slate-500 block">Section Score / نتيجة القسم الأول:</span>
+                    <span id="comp-section-sum" class="font-bold text-slate-800 text-lg">2.49 / 5.0</span>
+                </div>
+            </div>
+
+            <!-- SECTION III: Managers Performance Evaluation (25%) -->
+            <div id="manager-section-container" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-lg">Section III: Manager Performance Evaluation / تقييم أداء المديرين</h3>
+                        <p class="text-xs text-slate-400">Score Weight: 25% (Applicable only to Manager Category - Calculated as simple average of Self, Supervisor & 360 Peer inputs)</p>
+                    </div>
+                    <span class="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Weight: 25%</span>
+                </div>
+                
+                <div class="p-6 overflow-x-auto">
+                    <table class="w-full text-sm text-left border-collapse min-w-[800px]">
+                        <thead>
+                            <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 font-semibold">
+                                <th class="py-3 px-4">Managerial Factor / عامل الأداء المالي والقيادي</th>
+                                <th class="py-3 px-4 w-1/3">Core Focus / تفاصيل التركيز والمهام القيادية</th>
+                                <th class="py-3 px-4 w-28 text-center">Self Rating / تقييم ذاتي</th>
+                                <th class="py-3 px-4 w-28 text-center">Supervisor / المدير المباشر</th>
+                                <th class="py-3 px-4 w-28 text-center">Peer 360 / تقييم الزملاء</th>
+                                <th class="py-3 px-4 w-28 text-right">Weighted Average / المتوسط المرجح</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mgr-table-body">
+                            <!-- Dynamically loaded -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bg-slate-50 p-4 border-t border-slate-100 text-right">
+                    <span class="text-xs text-slate-500 block">Section Score / نتيجة التقييم القيادي:</span>
+                    <span id="mgr-section-sum" class="font-bold text-slate-800 text-lg">2.63 / 5.0</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 3: STRATEGIC FUTURE GOALS ==================== -->
+        <section id="tab-objectives" class="hidden space-y-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Left: Interactive Strategic Alignment Engine -->
+                <div class="lg:col-span-1 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
+                    <div>
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
+                            <i data-lucide="git-fork" class="text-red-500 w-5 h-5"></i>
+                            Strategic Goal Linker / ربط الأهداف الاستراتيجية
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-2">Map upcoming employee objectives directly with CARE's Organizational & Departmental DB Pillars.</p>
+                    </div>
+
+                    <!-- Alignment Inputs Form -->
+                    <!-- Edit 4: Generous padding, min-width rules, and wide selectors applied to prevent cutting off text -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 tracking-wider mb-2">1. SELECT Pillar / محور الاستراتيجية</label>
+                            <select id="link-pillar" onchange="filterObjectivesDB()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-3 text-sm focus:border-red-500 focus:outline-none min-h-[46px] truncate">
+                                <option value="Impact">Impact / أثر البرامج والتمكين</option>
+                                <option value="Organization">Organization / التطوير المؤسسي والامتثال والتأثير</option>
+                                <option value="Resources">Resources / تنويع واستدامة الموارد المالية والإنفاق</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 tracking-wider mb-2">2. SELECT Organizational KPI / الهدف المؤسسي</label>
+                            <select id="link-org-obj" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-3 text-sm focus:border-red-500 focus:outline-none min-h-[46px] max-w-full whitespace-normal leading-tight">
+                                <!-- Loaded based on chosen Pillar -->
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 tracking-wider mb-2">3. CHOOSE Target Department / أهداف الإدارة</label>
+                            <select id="link-dept-obj" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-3 text-sm focus:border-red-500 focus:outline-none min-h-[46px] max-w-full whitespace-normal leading-tight">
+                                <!-- Loaded dynamically -->
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 tracking-wider mb-2">4. DEFINE Upcoming Individual SMART Objective / الهدف الفردي</label>
+                            <textarea id="link-indiv-obj" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-red-500 focus:outline-none" placeholder="Provide details on target metric, timelines and success measures..."></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 tracking-wider mb-2">Target Weight (%)</label>
+                                <input id="link-weight" type="number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-red-500 focus:outline-none" value="20">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 tracking-wider mb-2">Timeline</label>
+                                <input id="link-timeline" type="text" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-red-500 focus:outline-none" value="">
+                            </div>
+                        </div>
+
+                        <button onclick="addStrategicGoalToTable()" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Link and Append Objective
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right: Targets Dashboard for Upcoming Review Period -->
+                <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
+                            <i data-lucide="table-properties" class="text-red-500 w-5 h-5"></i>
+                            Linked Upcoming Objectives Table / مواءمة الأهداف المستقبلية المتفق عليها
+                        </h3>
+                        
+                        <div class="overflow-x-auto mt-4">
+                            <table class="w-full text-xs text-left border-collapse min-w-[600px]">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 font-semibold text-slate-600">
+                                        <th class="py-3 px-3">Pillar</th>
+                                        <th class="py-3 px-3">Departmental/Org Goal Link</th>
+                                        <th class="py-3 px-3">SMART Objective / الهدف الفردي</th>
+                                        <th class="py-3 px-3 w-16">Weight</th>
+                                        <th class="py-3 px-3 w-20">Timeline</th>
+                                        <th class="py-3 px-3 w-12">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="future-goals-table-body">
+                                    <!-- Dynamic elements saved here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-100 pt-4 mt-6 flex justify-between items-center text-xs text-slate-400">
+                        <span>Assure total linked weights equal 100%.</span>
+                        <div class="flex gap-2">
+                            <button onclick="exportGoalsTable()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg font-medium transition flex items-center gap-1.5 text-xs">
+                                <i data-lucide="arrow-down-to-line" class="w-3.5 h-3.5"></i> Export Plan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <span>© 2026 Care Egypt Foundation. Performance appraisal digital workbook alignment.</span>
+            <div class="flex gap-4">
+                <button id="send-to-hr-btn" onclick="finishAndSendToHR()" class="hover:text-white flex items-center gap-1.5">
+                    <i data-lucide="send" class="w-3.5 h-3.5"></i> Finished - Send to HR
+                </button>
+                <a href="mailto:HR_Team@cef-eg.org" class="hover:text-white flex items-center gap-1.5">
+                    <i data-lucide="mail" class="w-3.5 h-3.5"></i> Help & HR Support: HR_Team@cef-eg.org
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JS Logic Block -->
+    <script>
+        // Database from Excel sheets
+        const generalObjectives = [
+            { pillar: "Impact", kpi: "KPI-01", text: "KPI-01: Enhance program impact through evidence-based evaluations and integrated data systems.\nتعزيز أثر البرامج من خلال التقييمات القائمة على الأدلة وأنظمة البيانات المتكاملة." },
+            { pillar: "Impact", kpi: "KPI-02", text: "KPI-02: Achieve full compliance with at least 4 of CARE’s global minimum quality standards through internal reviews.\nتحقيق الامتثال الكامل لما لا يقل عن ٤ من معايير الجودة الدنيا لـ كير العالمية." },
+            { pillar: "Impact", kpi: "KPI-03", text: "KPI-03: Increase partner-led projects by 20% and partner-implemented humanitarian projects by 10% by Dec 2026.\nزيادة المبادرات والمشاريع التي يقودها الشركاء بنسبة ٢٠٪ بحلول ديسمبر ٢٠٢٦." },
+            { pillar: "Organization", kpi: "KPI-04", text: "KPI-04: Review, update, and implement Standard Operating Procedures (SOPs) for HR, Finance and Procurement.\nمراجعة وتحديث وتفعيل إجراءات التشغيل القياسية للموارد البشرية والمالية والمشتريات." },
+            { pillar: "Organization", kpi: "KPI-05", text: "KPI-05: Review and activate an updated organizational structure aligned with strategic priorities by Q3 2026.\nمراجعة وتفعيل الهيكل التنظيمي المحدث بما يتوافق مع الأولويات بحلول الربع الثالث." },
+            { pillar: "Organization", kpi: "KPI-06", text: "KPI-06: Launch the AI Support Assistant system for HR, Finance, and Procurement units by Q3 2026.\nإطلاق نظام المساعد الذكي المدعوم بالذكاء الاصطناعي لوحدات الموارد البشرية والمالية بحلول الربع الثالث." },
+            { pillar: "Organization", kpi: "KPI-07", text: "KPI-07: Increase staff satisfaction by at least 20% by Dec 2026.\nزيادة مستوى رضا الموظفين بنسبة ٢٠٪ على الأقل بحلول نهاية ٢٠٢٦." },
+            { pillar: "Resources", kpi: "KPI-08", text: "KPI-08: Maintain an average burn rate of at least 90% across all active projects, monitored quarterly.\nالحفاظ على معدل صرف وسحب لا يقل عن ٩٠٪ لجميع المشروعات النشطة." },
+            { pillar: "Resources", kpi: "KPI-09", text: "KPI-09: Sustain CARE Egypt’s financial portfolio between 300–350 million EGP per program.\nاستدامة المحفظة التمويلية لجمعية كير مصر بين ٣٠٠ و ٣٥٠ مليون جنيه لكل برنامج تنموي." },
+            { pillar: "Resources", kpi: "KPI-10", text: "KPI-10: Design and launch at least one income-generating initiative by Dec 2026 to enhance financial sustainability.\nتصميم وإطلاق مبادرة واحدة على الأقل مدرة للدخل لتعزيز استدامة التمويل الذاتي." }
+        ];
+
+        const departmentDB = [
+            { dept: "Program", pillar: "Impact", id: "PO-01", text: "Strengthen evidence-based programming and accountability across all projects\nتعزيز البرمجة القائمة على الأدلة والمساءلة عبر جميع المشاريع." },
+            { dept: "Program", pillar: "Impact", id: "PO-02", text: "Enhance partnership effectiveness and sustainability\nتعزيز فعالية واستدامة الشراكات." },
+            { dept: "Program", pillar: "Impact", id: "PO-03", text: "Improve program quality and alignment with CARE standards\nتحسين جودة البرامج وضمان توافقها مع معايير هيئة كير." },
+            { dept: "Program", pillar: "Resources", id: "PO-04", text: "Maintain effective budget utilization and project delivery\nالحفاظ على الاستخدام الفعال للميزانية وتسليم المشاريع في مواعيدها." },
+            { dept: "Program", pillar: "Resources", id: "PO-05", text: "Sustain annual program portfolio to maximize impact and sustainability\nالحفاظ على محفظة البرامج السنوية لتعظيم الأثر والاستدامة." },
+            { dept: "Program", pillar: "Resources", id: "PO-06", text: "Proactively securing new awards with new donors to offset gaps created by ending awards and help sustain the overall portfolio\nالسعي الاستباقي لتأمين منح جديدة مع مانحين جدد لتعويض الفجوات الناتجة عن انتهاء بعض المنح والمساعدة في استدامة المحفظة العامة." },
+            { dept: "MEAL", pillar: "Impact", id: "ME-01", text: "Strengthen accountability and evidence-based programming through systematic monitoring and evaluation\nتعزيز المساءلة والبرمجة القائمة على الأدلة من خلال المتابعة والتقييم المنهجي." },
+            { dept: "MEAL", pillar: "Impact", id: "ME-02", text: "Improve data-driven decision-making for program learning\nتحسين اتخاذ القرارات المستندة إلى البيانات لدعم التعلم البرامجي." },
+            { dept: "MEAL", pillar: "Organization", id: "ME-03", text: "Build capacity of MEAL and program staff on accountability and data quality\nبناء قدرات موظفي المتابعة والتقييم والبرامج بشأن المساءلة وجوة البيانات." },
+            { dept: "HR & Admin", pillar: "Impact", id: "HR-01", text: "Meet Care quality standards\nتلبية معايير الجودة الخاصة بهيئة كير." },
+            { dept: "HR & Admin", pillar: "Impact", id: "HR-02", text: "Strengthen evidence-based HR impact through improved hiring quality and staff engagement\nتعزيز أثر الموارد البشرية القائم على الأدلة من خلال تحسين جودة التوظيف ودمج الموظفين." },
+            { dept: "HR & Admin", pillar: "Organization", id: "HR-03", text: "Boost staff satisfaction & Wellbeing\nتعزيز رضا الموظفين ورفاهيتهم." },
+            { dept: "HR & Admin", pillar: "Organization", id: "HR-04", text: "Review, update, and implement HR & Admin manual, SOPs and forms ensuring efficiency and compliance.\nمراجعة وتحديث وتنفيذ دليل الموارد البشرية والشؤون الإدارية وإجراءات التشغيل القياسية والنماذج لضمان الكفاءة والامتثال." },
+            { dept: "HR & Admin", pillar: "Organization", id: "HR-05", text: "Strengthen HR and Admin structure and role clarity\nتعزيز هيكل الموارد البشرية والشؤون الإدارية ووضوح الأدوار." },
+            { dept: "HR & Admin", pillar: "Organization", id: "HR-06", text: "Pilot and implement an updated performance appraisal tool organization-wide, leveraging technology and linking PA with KPIs\nتجربة وتنفيذ أداة محدثة لتقييم الأداء على مستوى المنظمة، مع الاستفادة من التكنولوجيا وربط تقييم الأداء بمؤشرات الأداء الرئيسية." },
+            { dept: "HR & Admin", pillar: "Organization", id: "HR-07", text: "Enhance program effectiveness and operational excellence through staff training and development initiatives that build essential skills, drive performance, and support successful delivery of organizational objectives.\nتعزيز فعالية البرامج والتميز التشغيلي من خلال مبادرات تدريب وتطوير الموظفين التي تبني المهارات الأساسية، وتدفع الأداء، وتدعم تحقيق الأهداف التنظيمية بنجاح." },
+            { dept: "HR & Admin", pillar: "Organization", id: "HR-08", text: "Enhance AI-supported HR processes\nتعزيز عمليات الموارد البشرية المدعومة بالذكاء الاصطناعي." },
+            { dept: "HR & Admin", pillar: "Resources", id: "HR-09", text: "Improve vendor and admin operations efficiency\nتحسين كفاءة عمليات الموردين والشؤون الإدارية." },
+            { dept: "HR & Admin", pillar: "Resources", id: "HR-10", text: "Ensure optimal asset and inventory management\nضمان الإدارة المثلى للأصول والمخزون." },
+            { dept: "Finance", pillar: "Resources", id: "F-01", text: "Meeting Care quality standards\nتلبية معايير الجودة الخاصة بهيئة كير." },
+            { dept: "Finance", pillar: "Resources", id: "F-02", text: "Ensure program sustainability by developing full-cost recovery budgets\nضمان استدامة البرنامج من خلال تطوير ميزانيات استرداد التكاليف الكاملة." },
+            { dept: "Finance", pillar: "Resources", id: "F-03", text: "Close monthly and annual accounts on time to support strategic decision-making\nإغلاق الحسابات الشهرية والسنوية في الوقت المحدد لدعم اتخاذ القرارات الاستراتيجية." },
+            { dept: "Finance", pillar: "Resources", id: "F-04", text: "Strengthen donor confidence through accurate and transparent financial reporting\nتعزيز ثقة المانحين من خلال التقارير المالية الدقيقة والشفافة." },
+            { dept: "Finance", pillar: "Resources", id: "F-05", text: "Maintain liquidity and ensure strong cash management\nالحفاظ على السيولة وضمان إدارة نقدية قوية." },
+            { dept: "Finance", pillar: "Resources", id: "F-06", text: "Improve cash flow forecasting accuracy\nتحسين دقة التنبؤ بالتدفقات النقدية." },
+            { dept: "Finance", pillar: "Resources", id: "F-07", text: "Tracking efficiency of burn rate and fund utilization\nتتبع كفاءة معدل الإنفاق واستخدام التمويل." },
+            { dept: "Finance", pillar: "Resources", id: "F-08", text: "Support organizational sustainability through accurate proposal costing\nدعم الاستدامة التنظيمية من خلال تقدير دقيق لتكاليف المقترحات." },
+            { dept: "Finance", pillar: "Organization", id: "F-09", text: "Enhance staff financial capacity and compliance awareness\nتعزيز القدرات المالية للموظفين ووعيهم بالامتثال." },
+            { dept: "Finance", pillar: "Organization", id: "F-10", text: "Strengthen coordination between finance and other units for system efficiency\nتعزيز التنسيق بين الإدارة المالية والوحدات الأخرى لرفع كفاءة النظام." },
+            { dept: "Finance", pillar: "Organization", id: "F-11", text: "Review, update, and implement Finance & Procurement policies and process mapping to simplify the operations\nمراجعة وتحديث وتنفيذ سياسات المالية والمشتريات ورسم خرائط العمليات لتبسيط العمليات." },
+            { dept: "SupplyChain", pillar: "Impact", id: "SC-01", text: "Meeting at least 4 quality standards\nالوفاء بـ ٤ معايير جودة على الأقل من معايير هيئة كير الدولية" },
+            { dept: "SupplyChain", pillar: "Organization", id: "SC-02", text: "Improve timeliness and efficiency of procurement to enhance project delivery\nتحسين توقيت وكفاءة المشتريات لتعزيز تسليم المشاريع." },
+            { dept: "SupplyChain", pillar: "Organization", id: "SC-03", text: "Standardize and update procurement and logistics SOPs to align with CARE global standards\nتوحيد وتحديث إجراءات التشغيل القياسية للمشتريات والخدمات اللوجستية لتتوافق مع معايير هيئة كير العالمية." },
+            { dept: "SupplyChain", pillar: "Resources", id: "SC-04", text: "Enabling faster, more efficient, and cost-effective procurement for recurrent goods and services\nتمكين عمليات شراء أسرع وأكثر كفاءة وفعالية من حيث التكلفة للسلع والخدمات المتكررة." },
+            { dept: "SupplyChain", pillar: "Resources", id: "SC-05", text: "Ensure cost efficiency and value for money in procurement\nضمان كفاءة التكلفة وتحقيق القيمة مقابل المال في المشتريات." },
+            { dept: "SupplyChain", pillar: "Resources", id: "SC-06", text: "Ensure efficiency by committing to process mapping time line\nضمان الكفاءة من خلال الالتزام بالجدول الزمني لرسم خرائط العمليات." },
+            { dept: "IT", pillar: "Organization", id: "IT-01", text: "Provide technical support to enhance program monitoring and digital impact measurement\nتقديم الدعم الفني لتعزيز مراقبة البرامج وقياس الأثر الرقمي." },
+            { dept: "IT", pillar: "Organization", id: "IT-02", text: "Maintain and upgrade IT infrastructure to ensure operational efficiency\nصيانة وتحديث البنية التحتية لتكنولوجيا المعلومات لضمان الكفاءة التشغيلية." },
+            { dept: "IT", pillar: "Organization", id: "IT-03", text: "Develop and enforce IT policies including data protection and acceptable use\nتطوير وإنفاذ سياسات تكنولوجيا المعلومات بما في ذلك حماية البيانات والاستخدام المقبول." },
+            { dept: "IT", pillar: "Organization", id: "IT-04", text: "Lead the digitalization and automation of organizational operations through introducing digital solutions, e-systems, (HRIS, e-procurement, finance tools) etc.\nقيادة التحول الرقمي وأتمتة العمليات التنظيمية من خلال إدخال الحلول الرقمية والأنظمة الإلكترونية (مثل نظام معلومات الموارد البشرية، المشتريات الإلكترونية، الأدوات المالية) وغيرها." },
+            { dept: "IT", pillar: "Resources", id: "IT-05", text: "Build basic needed staff capacity on digital literacy and cybersecurity\nبناء القدرات الأساسية اللازمة للموظفين في مجال الثقافة الرقمية والأمن السيبراني." },
+            { dept: "IT", pillar: "Resources", id: "IT-06", text: "Optimize IT resource utilization and licensing to reduce costs\nتحسين استخدام موارد تكنولوجيا المعلومات والتراخيص لتقليل التكاليف." },
+            { dept: "IT", pillar: "Resources", id: "IT-07", text: "Explore and implement cost-effective IT solutions (e.g., cloud or open-source tools)\nاستكشاف وتنفيذ حلول تكنولوجيا معلومات فعالة من حيث التكلفة (مثل الأدوات السحابية أو مفتوحة المصدر)." },
+            { dept: "Communication", pillar: "Impact", id: "COM-01", text: "Strengthen CARE Egypt's visibility and credibility through impactful storytelling, media engagement, and public events\nتعزيز ظهور ومصداقية هيئة كير مصر من خلال السرد القصصي المؤثر، والمشاركة الإعلامية، والفعاليات العامة." },
+            { dept: "Communication", pillar: "Impact", id: "COM-02", text: "Enhance CARE's external positioning among peer NGOs and stakeholders\nتعزيز المكانة الخارجية لهيئة كير بين المنظمات غير الحكومية النظيرة وأصحاب المصلحة." },
+            { dept: "Communication", pillar: "Impact", id: "COM-03", text: "Promote CARE's core values and culture internally through communication initiatives\nتعزيز القيم الجوهرية وثقافة هيئة كير داخليًا من خلال مبادرات الاتصال." },
+            { dept: "Communication", pillar: "Organization", id: "COM-04", text: "Strengthen coordination with departments to align messaging and program communication\nتعزيز التنسيق مع الأقسام لتوحيد الرسائل والاتصالات البرامجية." },
+            { dept: "Communication", pillar: "Resources", id: "COM-05", text: "Ensure consistent branding and messaging across all materials and platforms\nضمان اتساق الهوية البصرية (العلامة التجارية) والرسائل عبر جميع المواد والمنصات." },
+            { dept: "Communication", pillar: "Resources", id: "COM-06", text: "Maintain and enhance CARE Egypt's online visibility\nالحفاظ على وتعزيز الظهور الإلكتروني لهيئة كير مصر." },
+            { dept: "Communication", pillar: "Resources", id: "COM-07", text: "Develop a ready online organizational profile to attract donors and partners\nتطوير ملف تعريفي مؤسسي جاهز عبر الإنترنت لجذب المانحين والشركاء." }
+        ];
+
+        // Messages DB
+        const ratingScale = [
+            { min: 0, val: 1, label: "Poor / ضعيف", en: "Thank you for your efforts. Performance did not meet requirements in key areas. We encourage structured supervisor alignment.", ar: "نشكرك على جهودك. لم يحقق الأداء المستوى المتوقع في عدد من الجوانب الأساسية. نشجعك على العمل مع مديرك لوضع خطة تطوير واضحة." },
+            { min: 0.5, val: 2, label: "Partially Meets Requirements / يفي جزئيًا", en: "Thank you for your commitment. While several expectations have been met, there are opportunities to strengthen your performance.", ar: "نشكر لك التزامك طوال العام. لقد حققت بعض متطلبات الأداء، إلا أنه لا تزال هناك فرص لتعزيز أدائك من خلال التدريب." },
+            { min: 0.7, val: 3, label: "Fully Meets Requirements / يفي بالتوقعات تمامًا", en: "Well done! You have successfully met the expectations of your role and contributed positively to team objectives.", ar: "أحسنت! لقد حققت متطلبات دورك وساهمت بشكل إيجابي في دعم أهداف فريق العمل والمؤسسة." },
+            { min: 0.9, val: 4, label: "Exceeds Requirements / يتجاوز التوقعات", en: "Excellent work! Your performance consistently exceeded expectations, reflecting strong commitment and quality.", ar: "عمل متميز! لقد تجاوز أداؤك التوقعات بشكل مستمر، مما يعكس التزامك العالي وتحملك للمسؤولية." },
+            { min: 0.95, val: 5, label: "Significantly Exceeds / يتجاوز بشكل استثنائي", en: "Congratulations on an exceptional year! Your outstanding performance and leadership have created deep positive impact.", ar: "تهانينا على عام استثنائي! لقد كان لأدائك المتميز وقيادتك والتزامك أثر واضح وملموس في المؤسسة." }
+        ];
+
+        // State variables
+        let goals = [];
+
+        // Edit 3: Populated fully translated Arabic properties inside the actual JS objects for rendering
+        let coreCompetencies = [
+            { name: "Learning / التعلم المستمر", desc: "Seeks and applies learning; shares knowledge.\nيسعى لطلب العلم وتطبيقه؛ ويشارك المعرفة والخبرات بنشاط مع فريقه.", self: 0, supervisor: 0, peer360: 0 },
+            { name: "Diversity and Equity / العدالة والاندماج وتنوع الموارد البشرية", desc: "Treats others without bias; promotes inclusion.\nيتعامل بمهنية عالية دون انحياز؛ ويدعم بيئة عمل تشمل الجميع باحترام متبادل.", self: 0, supervisor: 0, peer360: 0 },
+            { name: "Integrity / النزاهة وأخلاقيات العمل", desc: "Acts honestly; uses resources responsibly.\nيتصرف بأمانة تامة؛ ويستخدم موارد المؤسسة والتمويل بمسؤولية وحرص شديد.", self: 0, supervisor: 0, peer360: 0 },
+            { name: "Teamwork & Relations / العمل بروح الفريق والعلاقات المهنية", desc: "Builds positive relations; listens actively.\nيبني علاقات عمل إيجابية بناءة؛ ويستمع بفاعلية واهتمام لوجهات النظر المختلفة.", self: 0, supervisor: 0, peer360: 0 },
+            { name: "Excellence & Quality of work / التميز وجودة المخرجات", desc: "Produces accurate, high-quality work.\nينتج عملاً دقيقاً ذا جودة ممتازة يطابق المعايير والمؤشرات المعتمدة لدى الهيئة.", self: 0, supervisor: 0, peer360: 0 },
+            { name: "Planning & Organization / التخطيط السليم وتنظيم المهام", desc: "Sets priorities; meets strict deadlines.\nيحدد الأولويات المهنية بذكاء؛ ويلتزم التزاماً كاملاً بالإنهاء في المواعيد المقررة.", self: 0, supervisor: 0, peer360: 0 },
+            { name: "Initiative & Accountability / المبادرة الفردية وتحمل المسؤولية", desc: "Takes ownership; suggests improvements.\nيتحمل كامل المسؤولية عن نتائجه؛ ويقترح بادرًا حلولًا إبداعية لتطوير الأداء.", self: 0, supervisor: 0, peer360: 0 }
+        ];
+
+        let managerCompetencies = [
+            { factor: "Projects & Budget Management / إدارة المشاريع والموازنات المالية", desc: "Works within budget; optimizes resources on time.\nيعمل في حدود الميزانية المخصصة؛ ويستغل الموارد بطريقة مثالية وفق الخطة الزمنية.", self: 0, supervisor: 0, peer360: 0 },
+            { factor: "Delegation & Supervision / تفويض المهام والمتابعة والتوجيه", desc: "Defines roles clearly; assigns tasks effectively.\nيحدد الأدوار بوضوح تام للموظفين؛ ويوزع المهام على الفريق بكفاءة ومسؤولية.", self: 0, supervisor: 0, peer360: 0 },
+            { factor: "Staff Development / بناء قدرات الموظفين والتدريب المستمر", desc: "Provides growth opportunities; gives coaching.\nيوفر فرص نمو وتطور مهني ملموسة؛ ويقدم التوجيه والتمكين المستمر لأعضاء الفريق.", self: 0, supervisor: 0, peer360: 0 },
+            { factor: "Supervising Staff Relations / إدارة علاقات الموظفين وحل الخلافات", desc: "Handles complaints promptly; prevents conflicts.\nيتعامل بذكاء وحكمة مع المشاكل والشكاوى؛ ويسهم بفاعلية في منع الصراعات البينية.", self: 0, supervisor: 0, peer360: 0 }
+        ];
+
+        let futureGoals = [];
+
+        let chartInstance = null;
+
+        // ==================== LOCAL PERSISTENCE (auto-save on this device) ====================
+        // Everything the user types/selects is written to this browser's localStorage, keyed to
+        // this file, so it survives closing the browser/tab. It stays until "Clear All Data" is
+        // used (which also wipes the saved copy) - it is NOT cleared just by closing the file.
+        // Note: localStorage is per-browser/profile. Opening the file in a different browser (or
+        // after clearing that browser's site data) won't see this saved copy - use "Save to File" /
+        // "Load from File" below to carry data between browsers or computers.
+        const STORAGE_KEY = 'CARE_PA_FY26_27_v1';
+
+        function collectState() {
+            return {
+                version: 1,
+                savedAt: new Date().toISOString(),
+                profile: {
+                    name: document.getElementById('prof-name').value,
+                    role: document.getElementById('prof-role').value,
+                    dept: document.getElementById('prof-dept').value,
+                    cat: document.getElementById('prof-cat').value,
+                    email: document.getElementById('prof-email').value,
+                    mgrName: document.getElementById('mgr-name').value,
+                    mgrRole: document.getElementById('mgr-role').value,
+                    mgrEmail: document.getElementById('mgr-email').value
+                },
+                goals: goals,
+                coreCompetencies: coreCompetencies,
+                managerCompetencies: managerCompetencies,
+                futureGoals: futureGoals,
+                linker: {
+                    pillar: document.getElementById('link-pillar').value,
+                    weight: document.getElementById('link-weight').value,
+                    timeline: document.getElementById('link-timeline').value,
+                    indivObj: document.getElementById('link-indiv-obj').value
+                }
+            };
+        }
+
+        function applyState(state) {
+            if (!state) return;
+
+            if (state.profile) {
+                document.getElementById('prof-name').value = state.profile.name || '';
+                document.getElementById('prof-role').value = state.profile.role || '';
+                if (state.profile.dept) document.getElementById('prof-dept').value = state.profile.dept;
+                if (state.profile.cat) document.getElementById('prof-cat').value = state.profile.cat;
+                document.getElementById('prof-email').value = state.profile.email || '';
+                document.getElementById('mgr-name').value = state.profile.mgrName || '';
+                document.getElementById('mgr-role').value = state.profile.mgrRole || '';
+                document.getElementById('mgr-email').value = state.profile.mgrEmail || '';
+            }
+            if (Array.isArray(state.goals)) goals = state.goals;
+            if (Array.isArray(state.coreCompetencies)) coreCompetencies = state.coreCompetencies;
+            if (Array.isArray(state.managerCompetencies)) managerCompetencies = state.managerCompetencies;
+            if (Array.isArray(state.futureGoals)) futureGoals = state.futureGoals;
+            if (state.linker) {
+                if (state.linker.pillar) document.getElementById('link-pillar').value = state.linker.pillar;
+                document.getElementById('link-weight').value = state.linker.weight || 20;
+                document.getElementById('link-timeline').value = state.linker.timeline || '';
+                document.getElementById('link-indiv-obj').value = state.linker.indivObj || '';
+            }
+
+            // Re-render every section against the restored data
+            toggleManagerRole();
+            renderGoalsTable();
+            renderCompetenciesTable();
+            renderManagerTable();
+            filterObjectivesDB();
+            renderFutureGoalsTable();
+            recalculateAll();
+            lucide.createIcons();
+        }
+
+        function saveStateToLocalStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(collectState()));
+                flashAutosaveStatus('Saved just now');
+            } catch (err) {
+                console.warn('Could not auto-save locally:', err);
+                flashAutosaveStatus('Auto-save unavailable in this browser');
+            }
+        }
+
+        function loadStateFromLocalStorage() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                return raw ? JSON.parse(raw) : null;
+            } catch (err) {
+                console.warn('Could not read locally-saved data:', err);
+                return null;
+            }
+        }
+
+        function flashAutosaveStatus(message) {
+            const el = document.getElementById('autosave-status');
+            if (!el) return;
+            el.innerText = message;
+            clearTimeout(flashAutosaveStatus._t);
+            flashAutosaveStatus._t = setTimeout(() => { el.innerText = 'Auto-saved to this device'; }, 2000);
+        }
+
+        function initAutoSave() {
+            let saveTimer = null;
+            const scheduleSave = () => {
+                clearTimeout(saveTimer);
+                saveTimer = setTimeout(saveStateToLocalStorage, 500);
+            };
+            // Delegated listeners catch every input/select in the form - including rows
+            // added later to the Goals, Competencies, and Future Goals tables - without
+            // needing a handler wired to each individual field.
+            document.addEventListener('input', scheduleSave);
+            document.addEventListener('change', scheduleSave);
+        }
+
+        // ==================== SAVE / LOAD A SEPARATE BACKUP FILE ====================
+        function saveDataToFile() {
+            const state = collectState();
+            const employeeName = (document.getElementById('prof-name').value || 'Employee').trim().replace(/\s+/g, '_');
+            const dateStamp = new Date().toISOString().slice(0, 10);
+            const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `CARE_PA_Data_${employeeName}_${dateStamp}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function triggerLoadFromFile() {
+            document.getElementById('load-data-file-input').click();
+        }
+
+        function loadDataFromFile(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            if (!confirm('Loading this file will replace all data currently in the form. Continue?')) {
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const state = JSON.parse(e.target.result);
+                    applyState(state);
+                    saveStateToLocalStorage();
+                } catch (err) {
+                    console.error('Failed to load data file:', err);
+                    alert('This file could not be read. Please make sure it is a .json data file previously saved from this tool.');
+                }
+            };
+            reader.onerror = function() {
+                alert('This file could not be read.');
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // allow re-selecting the same file later if needed
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+
+            const savedState = loadStateFromLocalStorage();
+            if (savedState) {
+                applyState(savedState);
+            } else {
+                populateStrategicDropdowns();
+                renderGoalsTable();
+                renderCompetenciesTable();
+                renderManagerTable();
+                renderFutureGoalsTable();
+                recalculateAll();
+            }
+
+            initAutoSave();
+        };
+
+        function switchTab(tabId) {
+            const allTabs = ['dashboard', 'simulator', 'objectives'];
+            allTabs.forEach(id => {
+                document.getElementById('tab-' + id).classList.add('hidden');
+                document.getElementById('btn-' + id).className = "px-4 py-2 text-xs md:text-sm rounded-lg font-medium transition-all duration-200 text-slate-600 hover:text-slate-900 flex items-center gap-2";
+            });
+
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).className = "px-4 py-2 text-xs md:text-sm rounded-lg font-medium transition-all duration-200 active-tab bg-white shadow-sm text-red-600 flex items-center gap-2";
+        }
+
+        function toggleManagerRole() {
+            const category = document.getElementById('prof-cat').value;
+            const managerScoreCard = document.getElementById('manager-score-card-container');
+            const managerSection = document.getElementById('manager-section-container');
+            const compWeightLabel = document.getElementById('comp-weight-label');
+            const compWeightTag = document.getElementById('comp-weight-tag');
+
+            if (category === 'Manager') {
+                managerScoreCard.classList.remove('hidden');
+                managerSection.classList.remove('hidden');
+                compWeightLabel.innerHTML = 'Weight on final score: <strong class="text-slate-700">25%</strong>';
+                compWeightTag.innerText = 'Weight: 25%';
+            } else {
+                managerScoreCard.classList.add('hidden');
+                managerSection.classList.add('hidden');
+                compWeightLabel.innerHTML = 'Weight on final score: <strong class="text-slate-700">50%</strong>';
+                compWeightTag.innerText = 'Weight: 50%';
+            }
+        }
+
+        // ==================== RENDERING CORE TABLES ====================
+
+        function renderGoalsTable() {
+            const body = document.getElementById('goals-table-body');
+            body.innerHTML = '';
+            goals.forEach((g, idx) => {
+                const weightedFinal = (g.self * 0.3 + g.supervisor * 0.7).toFixed(2);
+                body.innerHTML += `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50">
+                        <td class="py-3.5 px-4 font-semibold text-slate-500">${idx+1}</td>
+                        <td class="py-3.5 px-4">
+                            <input type="text" class="w-full bg-transparent border-none focus:ring-0 text-slate-800 font-medium" value="${g.text}" onchange="goals[${idx}].text = this.value">
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <select onchange="goals[${idx}].status = this.value" class="bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs focus:outline-none min-w-[140px]">
+                                <option ${g.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                                <option ${g.status === 'Partially Completed' ? 'selected' : ''}>Partially Completed</option>
+                                <option ${g.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                                <option ${g.status === 'On Hold' ? 'selected' : ''}>On Hold</option>
+                            </select>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <input type="number" min="1" max="5" step="0.5" class="w-16 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-center font-semibold" value="${g.self}" onchange="updateGoalValue(${idx}, 'self', this.value)">
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <input type="number" min="1" max="5" step="0.5" class="w-16 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-center font-semibold" value="${g.supervisor}" onchange="updateGoalValue(${idx}, 'supervisor', this.value)">
+                        </td>
+                        <td class="py-3.5 px-4 text-right font-bold text-slate-700" id="goal-weighted-${idx}">${weightedFinal}</td>
+                        <td class="py-3.5 px-4 text-center">
+                            <button onclick="deleteGoalRow(${idx})" title="Delete this objective" class="text-red-500 hover:text-red-700 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        function deleteGoalRow(idx) {
+            if (!confirm('Remove this objective from Section I? This cannot be undone.')) return;
+            goals.splice(idx, 1);
+            renderGoalsTable();
+            recalculateAll();
+            saveStateToLocalStorage();
+        }
+
+        function updateGoalValue(idx, field, val) {
+            let floatVal = parseFloat(val) || 0;
+            if(floatVal > 5) floatVal = 5;
+            if(floatVal < 0) floatVal = 0;
+            goals[idx][field] = floatVal;
+            recalculateAll();
+        }
+
+        function addGoalRow() {
+            goals.push({ no: goals.length + 1, text: "New Performance Objective / هدف فني إضافي جديد", status: "In Progress", self: 3, supervisor: 3 });
+            renderGoalsTable();
+            recalculateAll();
+            saveStateToLocalStorage();
+        }
+
+        // ==================== CLEAR ALL DATA ====================
+        // Resets every user-entered field across all 3 tabs back to a blank starting point.
+        // The standard competency framework (names/descriptions in Sections II & III) is
+        // kept intact since that's CARE's fixed evaluation rubric, not user-entered data -
+        // only its score inputs are zeroed out.
+        function clearAllData() {
+            const confirmed = confirm('This will clear all entered data - employee & manager info, goals, ratings, and future objectives - across all three tabs. This cannot be undone. Continue?');
+            if (!confirmed) return;
+
+            // Employee & manager profile fields
+            document.getElementById('prof-name').value = '';
+            document.getElementById('prof-role').value = '';
+            document.getElementById('prof-dept').selectedIndex = 0;
+            document.getElementById('prof-cat').selectedIndex = 0;
+            document.getElementById('prof-email').value = '';
+            document.getElementById('mgr-name').value = '';
+            document.getElementById('mgr-role').value = '';
+            document.getElementById('mgr-email').value = '';
+
+            // Section I: Goals Achievement - fully user-authored rows, so clear the list entirely
+            goals = [];
+
+            // Section II & III: keep the standard competency/factor names & descriptions,
+            // just reset every self/supervisor/peer360 score back to 0
+            coreCompetencies.forEach(c => { c.self = 0; c.supervisor = 0; c.peer360 = 0; });
+            managerCompetencies.forEach(m => { m.self = 0; m.supervisor = 0; m.peer360 = 0; });
+
+            // Tab 3: Future Strategic Goals
+            futureGoals = [];
+            document.getElementById('link-pillar').selectedIndex = 0;
+            document.getElementById('link-indiv-obj').value = '';
+            document.getElementById('link-weight').value = 20;
+            document.getElementById('link-timeline').value = '';
+            filterObjectivesDB();
+
+            // Re-render every table/section and recalculate scores from the cleared data
+            toggleManagerRole();
+            renderGoalsTable();
+            renderCompetenciesTable();
+            renderManagerTable();
+            renderFutureGoalsTable();
+            recalculateAll();
+            lucide.createIcons();
+
+            // Wipe the locally-saved copy too, so this blank state is what's still here
+            // next time the file is opened - not the data that was just cleared
+            try { localStorage.removeItem(STORAGE_KEY); } catch (err) { console.warn('Could not clear locally-saved data:', err); }
+            flashAutosaveStatus('Cleared');
+        }
+
+        // ==================== SCORING FORMULAS ====================
+        // Peer 360 inputs default/reset to 0 and are optional (Self and Supervisor are
+        // required, min="1"; Peer 360 is min="0"). Previously, an unrated Peer 360 of 0
+        // was still multiplied into the weighted formula, silently dragging every score
+        // down by up to 20% (Core Competencies) or a third (Manager Factors) whenever
+        // 360 feedback wasn't collected - the normal case for most appraisals. These
+        // helpers detect that case and redistribute the Peer 360 weight proportionally
+        // across Self/Supervisor instead, so a competency with only Self+Supervisor
+        // filled in can still reach the full 5/5, exactly like Section I goals already do.
+        function computeCompScore(c) {
+            if (c.peer360 && c.peer360 > 0) {
+                return c.self * 0.2 + c.supervisor * 0.6 + c.peer360 * 0.2; // 20% Self / 60% Supervisor / 20% Peer 360
+            }
+            return c.self * 0.25 + c.supervisor * 0.75; // Peer 360 not rated - redistributed to 25% Self / 75% Supervisor
+        }
+
+        function computeMgrScore(m) {
+            if (m.peer360 && m.peer360 > 0) {
+                return (m.self + m.supervisor + m.peer360) / 3;
+            }
+            return (m.self + m.supervisor) / 2; // Peer 360 not rated - average of Self/Supervisor only
+        }
+
+        function renderCompetenciesTable() {
+            const body = document.getElementById('comp-table-body');
+            body.innerHTML = '';
+            coreCompetencies.forEach((c, idx) => {
+                const weightedFinal = computeCompScore(c).toFixed(2);
+                body.innerHTML += `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 text-xs md:text-sm">
+                        <td class="py-4 px-4 font-bold text-slate-800 leading-tight">${c.name}</td>
+                        <td class="py-4 px-4 text-slate-500 whitespace-pre-line leading-snug">${c.desc}</td>
+                        <td class="py-4 px-4 text-center">
+                            <input type="number" min="1" max="5" step="0.5" class="w-16 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-center font-semibold" value="${c.self}" onchange="updateCompValue(${idx}, 'self', this.value)">
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <input type="number" min="1" max="5" step="0.5" class="w-16 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-center font-semibold" value="${c.supervisor}" onchange="updateCompValue(${idx}, 'supervisor', this.value)">
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <input type="number" min="0" max="5" step="0.5" class="w-16 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-center font-semibold" value="${c.peer360}" onchange="updateCompValue(${idx}, 'peer360', this.value)">
+                        </td>
+                        <td class="py-4 px-4 text-right font-bold text-slate-700" id="comp-weighted-${idx}">${weightedFinal}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updateCompValue(idx, field, val) {
+            let floatVal = parseFloat(val) || 0;
+            if(floatVal > 5) floatVal = 5;
+            if(floatVal < 0) floatVal = 0;
+            coreCompetencies[idx][field] = floatVal;
+            recalculateAll();
+        }
+
+        function renderManagerTable() {
+            const body = document.getElementById('mgr-table-body');
+            body.innerHTML = '';
+            managerCompetencies.forEach((m, idx) => {
+                const avgVal = computeMgrScore(m).toFixed(2);
+                body.innerHTML += `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 text-xs md:text-sm">
+                        <td class="py-4 px-4 font-bold text-slate-800 leading-tight">${m.factor}</td>
+                        <td class="py-4 px-4 text-slate-500 whitespace-pre-line leading-snug">${m.desc}</td>
+                        <td class="py-4 px-4 text-center">
+                            <input type="number" min="1" max="5" step="0.5" class="w-16 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-center font-semibold" value="${m.self}" onchange="updateMgrValue(${idx}, 'self', this.value)">
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <input type="number" min="1" max="5" step="0.5" class="w-16 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-center font-semibold" value="${m.supervisor}" onchange="updateMgrValue(${idx}, 'supervisor', this.value)">
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <input type="number" min="0" max="5" step="0.5" class="w-16 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-center font-semibold" value="${m.peer360}" onchange="updateMgrValue(${idx}, 'peer360', this.value)">
+                        </td>
+                        <td class="py-4 px-4 text-right font-bold text-slate-700" id="mgr-avg-${idx}">${avgVal}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updateMgrValue(idx, field, val) {
+            let floatVal = parseFloat(val) || 0;
+            if(floatVal > 5) floatVal = 5;
+            if(floatVal < 0) floatVal = 0;
+            managerCompetencies[idx][field] = floatVal;
+            recalculateAll();
+        }
+
+        // ==================== RECALCULATION ENGINE ====================
+
+
+        function recalculateAll() {
+            // 1. Recalculate Goals (Weight: 50% technical)
+            let goalsSum = 0;
+            let validGoalsCount = 0;
+            goals.forEach((g, idx) => {
+                const val = g.self * 0.3 + g.supervisor * 0.7;
+                goalsSum += val;
+                validGoalsCount++;
+                const element = document.getElementById(`goal-weighted-${idx}`);
+                if (element) element.innerText = val.toFixed(2);
+            });
+            const goalsPct = validGoalsCount > 0 ? (goalsSum / (validGoalsCount * 5)) : 0;
+            const goalRatingOutOfFive = goalsPct * 5;
+            document.getElementById('goals-section-sum').innerText = validGoalsCount > 0
+                ? `${goalsSum.toFixed(2)} / ${validGoalsCount * 5} (${(goalsPct * 100).toFixed(0)}%)`
+                : 'No objectives added yet';
+            document.getElementById('goal-score-card').innerText = `${goalRatingOutOfFive.toFixed(2)} / 5.0`;
+            document.getElementById('goal-score-progress').style.width = `${goalsPct * 100}%`;
+
+            // 2. Recalculate Competencies (Values)
+            let compSum = 0;
+            coreCompetencies.forEach((c, idx) => {
+                const val = computeCompScore(c);
+                compSum += val;
+                const element = document.getElementById(`comp-weighted-${idx}`);
+                if (element) element.innerText = val.toFixed(2);
+            });
+            const compMax = coreCompetencies.length * 5;
+            const compPct = compMax > 0 ? (compSum / compMax) : 0;
+            const compRatingOutOfFive = compPct * 5;
+            document.getElementById('comp-section-sum').innerText = `${compSum.toFixed(2)} / ${compMax}`;
+            document.getElementById('comp-score-card').innerText = `${compRatingOutOfFive.toFixed(2)} / 5.0`;
+            document.getElementById('comp-score-progress').style.width = `${compPct * 100}%`;
+
+            // 3. Recalculate Managerial Factors
+            let mgrSum = 0;
+            managerCompetencies.forEach((m, idx) => {
+                const val = computeMgrScore(m);
+                mgrSum += val;
+                const element = document.getElementById(`mgr-avg-${idx}`);
+                if (element) element.innerText = val.toFixed(2);
+            });
+            const mgrMax = managerCompetencies.length * 5;
+            const mgrPct = mgrMax > 0 ? (mgrSum / mgrMax) : 0;
+            const mgrRatingOutOfFive = mgrPct * 5;
+            document.getElementById('mgr-section-sum').innerText = `${mgrSum.toFixed(2)} / ${mgrMax}`;
+            document.getElementById('mgr-score-card').innerText = `${mgrRatingOutOfFive.toFixed(2)} / 5.0`;
+            document.getElementById('mgr-score-progress').style.width = `${mgrPct * 100}%`;
+
+            // 4. Calculate Final Aggregated Weighted Score
+            const isManager = document.getElementById('prof-cat').value === 'Manager';
+            let finalWeightedScore = 0;
+
+            if (isManager) {
+                // Goals = 50%, Competencies = 25%, Managerial = 25%
+                finalWeightedScore = (goalsPct * 0.5) + (compPct * 0.25) + (mgrPct * 0.25);
+            } else {
+                // Goals = 50%, Competencies = 50%
+                finalWeightedScore = (goalsPct * 0.5) + (compPct * 0.5);
+            }
+
+            // Convert to 1-5 Scale
+            const finalScore1to5 = finalWeightedScore * 5;
+            document.getElementById('overall-score-display').innerText = finalScore1to5.toFixed(2);
+
+            // Find matching Message Criteria
+            let matchedMessage = ratingScale[0];
+            for (let i = 0; i < ratingScale.length; i++) {
+                if (finalWeightedScore >= ratingScale[i].min) {
+                    matchedMessage = ratingScale[i];
+                }
+            }
+
+            document.getElementById('overall-rating-label').innerText = matchedMessage.label;
+            const perfMsgEnEl = document.getElementById('perf-msg-en');
+            if (perfMsgEnEl) perfMsgEnEl.innerText = `"${matchedMessage.en}"`;
+            const perfMsgArEl = document.getElementById('perf-msg-ar');
+            if (perfMsgArEl) perfMsgArEl.innerText = `"${matchedMessage.ar}"`;
+
+            // Trigger Charts Refresh
+            renderCharts(goalRatingOutOfFive, compRatingOutOfFive, isManager ? mgrRatingOutOfFive : null, finalScore1to5);
+        }
+
+        // ==================== FUTURE GOALS STRATEGIC LINKER ====================
+
+        function populateStrategicDropdowns() {
+            // Populate Pillars
+            filterObjectivesDB();
+        }
+
+        function filterObjectivesDB() {
+            const selectedPillar = document.getElementById('link-pillar').value;
+            const employeeDept = document.getElementById('prof-dept').value;
+            const orgSelect = document.getElementById('link-org-obj');
+            const deptSelect = document.getElementById('link-dept-obj');
+
+            orgSelect.innerHTML = '';
+            generalObjectives.filter(o => o.pillar === selectedPillar).forEach(o => {
+                orgSelect.innerHTML += `<option class="whitespace-normal leading-tight" value="${o.kpi}">${o.text}</option>`;
+            });
+
+            // Only show the employee's own department's goals (from Tab 1), narrowed to the selected pillar
+            deptSelect.innerHTML = '';
+            const matchingDeptGoals = departmentDB.filter(d => d.pillar === selectedPillar && d.dept === employeeDept);
+            if (matchingDeptGoals.length === 0) {
+                deptSelect.innerHTML = `<option value="" disabled selected class="whitespace-normal leading-tight">No ${employeeDept} objectives under the ${selectedPillar} pillar</option>`;
+            } else {
+                matchingDeptGoals.forEach(d => {
+                    deptSelect.innerHTML += `<option class="whitespace-normal leading-tight" value="${d.id}">${d.id}: ${d.text}</option>`;
+                });
+            }
+        }
+
+        function addStrategicGoalToTable() {
+            const pillar = document.getElementById('link-pillar').value;
+            const orgKpi = document.getElementById('link-org-obj').value;
+            const smartText = document.getElementById('link-indiv-obj').value.trim();
+            const weight = parseInt(document.getElementById('link-weight').value) || 20;
+            const timeline = document.getElementById('link-timeline').value.trim();
+
+            if (!smartText) {
+                alert("Please write a SMART objective before appending.");
+                return;
+            }
+
+            futureGoals.push({
+                pillar: pillar,
+                ref: orgKpi,
+                SMART: smartText,
+                weight: weight,
+                timeline: timeline
+            });
+
+            document.getElementById('link-indiv-obj').value = '';
+            renderFutureGoalsTable();
+            saveStateToLocalStorage();
+        }
+
+        function renderFutureGoalsTable() {
+            const body = document.getElementById('future-goals-table-body');
+            body.innerHTML = '';
+            futureGoals.forEach((fg, idx) => {
+                body.innerHTML += `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50">
+                        <td class="py-3 px-3 font-semibold text-slate-700">${fg.pillar}</td>
+                        <td class="py-3 px-3 text-slate-500 text-xs">${fg.ref}</td>
+                        <td class="py-3 px-3 font-medium text-slate-800">${fg.SMART}</td>
+                        <td class="py-3 px-3 font-semibold text-slate-800">${fg.weight}%</td>
+                        <td class="py-3 px-3 text-slate-500">${fg.timeline}</td>
+                        <td class="py-3 px-3">
+                            <button onclick="deleteGoal(${idx})" class="text-red-500 hover:text-red-700 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        function deleteGoal(idx) {
+            futureGoals.splice(idx, 1);
+            renderFutureGoalsTable();
+            saveStateToLocalStorage();
+        }
+
+        function exportGoalsTable() {
+            let output = "CARE EGYPT FUTURE STRATEGIC GOALS PLAN\n============================\n";
+            futureGoals.forEach(g => {
+                output += `Pillar: ${g.pillar} | Ref: ${g.ref} | Metric: ${g.SMART} | Weight: ${g.weight}% | Due: ${g.timeline}\n`;
+            });
+            const blob = new Blob([output], { type: "text/plain;charset=utf-8;" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute("download", "CARE_Strategic_Objectives_FY26-27.txt");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function copyFeedbackSummary() {
+            const enMsg = document.getElementById('perf-msg-en').innerText;
+            const arMsg = document.getElementById('perf-msg-ar').innerText;
+            const finalScore = document.getElementById('overall-score-display').innerText;
+            const rating = document.getElementById('overall-rating-label').innerText;
+            const textToCopy = `Performance Appraisal Summary FY 25/26\n----------------------------------\nFinal Rating Score: ${finalScore} / 5.0 (${rating})\n\nEnglish Narrative:\n${enMsg}\n\nArabic Narrative:\n${arMsg}`;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert("Summary copied to clipboard!");
+            });
+        }
+
+        // ==================== RENDERING CHART ====================
+
+        function renderCharts(goalRating, compRating, mgrRating, finalRating) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            const labels = ['Technical Goals', 'Core Values & Competencies', 'Overall Weighted Rating'];
+            const data = [goalRating, compRating, finalRating];
+            const colors = ['#0284c7', '#f59e0b', '#C51B27'];
+
+            if (mgrRating !== null) {
+                labels.splice(2, 0, 'Managerial Competencies');
+                data.splice(2, 0, mgrRating);
+                colors.splice(2, 0, '#6366f1');
+            }
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Performance Score Range (1-5 Scale)',
+                        data: data,
+                        backgroundColor: colors,
+                        borderRadius: 8,
+                        maxBarThickness: 45,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 5,
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
+        }
+// ==================== PDF EXPORT (html2canvas - preserves Arabic perfectly) ====================
+async function exportToPDF() {
+    const employeeName = document.getElementById('prof-name').value || 'Employee';
+    const previousTab = ['dashboard', 'simulator', 'objectives'].find(t =>
+        !document.getElementById('tab-' + t).classList.contains('hidden')
+    ) || 'dashboard';
+
+    const exportBtn = document.getElementById('export-pdf-btn');
+    const originalBtnHTML = exportBtn ? exportBtn.innerHTML : null;
+    if (exportBtn) {
+        exportBtn.disabled = true;
+        exportBtn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Generating PDF...';
+        if (window.lucide) lucide.createIcons();
+    }
+
+    try {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'landscape' });
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const margin = 24;
+
+        const tabOrder = ['dashboard', 'simulator', 'objectives'];
+        const tabTitles = {
+            dashboard: 'Dashboard & Visualizations',
+            simulator: 'FY 25/26 Appraisal',
+            objectives: 'Future Strategic Goals'
+        };
+
+        for (let i = 0; i < tabOrder.length; i++) {
+            const tabId = tabOrder[i];
+            switchTab(tabId);
+            await new Promise(r => setTimeout(r, 300));
+            if (tabId === 'dashboard' && chartInstance) {
+                chartInstance.resize();
+            }
+            await new Promise(r => requestAnimationFrame(r));
+
+            const element = document.getElementById('tab-' + tabId);
+            const canvas = await html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#f8fafc',
+                logging: false
+            });
+
+            const imgData = canvas.toDataURL('image/jpeg', 0.95);
+            const availableWidth = pageWidth - margin * 2;
+            const availableHeight = pageHeight - margin * 2;
+            const ratio = Math.min(availableWidth / canvas.width, availableHeight / canvas.height);
+            const imgWidth = canvas.width * ratio;
+            const imgHeight = canvas.height * ratio;
+            const x = (pageWidth - imgWidth) / 2;
+            const y = margin;
+
+            if (i > 0) pdf.addPage('a4', 'landscape');
+            pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+        }
+
+        pdf.save(`Performance_Appraisal_FY26_${employeeName.replace(/\s+/g, '_')}.pdf`);
+    } catch (err) {
+        console.error('PDF export failed:', err);
+        alert('Something went wrong while generating the PDF. Please try again.');
+    } finally {
+        switchTab(previousTab);
+        if (exportBtn) {
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = originalBtnHTML;
+            if (window.lucide) lucide.createIcons();
+        }
+    }
+}
+
+// ==================== CSV EXPORT (Excel-readable data tables) ====================
+function exportToCSV() {
+    const employeeName = document.getElementById('prof-name').value || 'Employee';
+    const dept = document.getElementById('prof-dept').value || '';
+    const cat = document.getElementById('prof-cat').value || '';
+    const mgrName = document.getElementById('mgr-name').value || '';
+    const overall = document.getElementById('overall-score-display').innerText || '';
+
+    let csv = '\uFEFF'; // UTF-8 BOM for Excel Arabic support
+    csv += 'CARE Egypt Foundation - Performance Appraisal Data Export\n';
+    csv += 'FY 2025-2026\n\n';
+    csv += 'EMPLOYEE INFORMATION\n';
+    csv += `Name,${document.getElementById('prof-name').value || ''}\n`;
+    csv += `Role,${document.getElementById('prof-role').value || ''}\n`;
+    csv += `Department,${dept}\n`;
+    csv += `Category,${cat}\n`;
+    csv += `Email,${document.getElementById('prof-email').value || ''}\n`;
+    csv += `Manager,${mgrName}\n`;
+    csv += `Manager Email,${document.getElementById('mgr-email').value || ''}\n`;
+    csv += `Overall Score,${overall}\n`;
+    csv += `Rating,${document.getElementById('overall-rating-label').innerText || ''}\n\n`;
+
+    // Section I: Goals
+    csv += 'SECTION I: GOALS ACHIEVEMENT (Weight: 50%)\n';
+    csv += 'No,Objective,Status,Self Rating (30%),Supervisor Rating (70%),Weighted Final\n';
+    if (goals.length > 0) {
+        goals.forEach((g, i) => {
+            const weighted = (g.self * 0.3 + g.supervisor * 0.7).toFixed(2);
+            csv += `${i+1},"${g.text}","${g.status}",${g.self.toFixed(1)},${g.supervisor.toFixed(1)},${weighted}\n`;
+        });
+    } else {
+        csv += 'No objectives added yet\n';
+    }
+    csv += `Section Score,${document.getElementById('goals-section-sum').innerText || ''}\n\n`;
+
+    // Section II: Core Competencies
+    csv += 'SECTION II: CORE COMPETENCIES & VALUES\n';
+    csv += 'Competency,Self Rating (20%),Supervisor Rating (60%),Peer 360 (20%),Weighted Final\n';
+    coreCompetencies.forEach(c => {
+        const weighted = computeCompScore(c).toFixed(2);
+        csv += `"${c.name}",${c.self.toFixed(1)},${c.supervisor.toFixed(1)},${(c.peer360 || 0).toFixed(1)},${weighted}\n`;
+    });
+    csv += `Section Score,${document.getElementById('comp-section-sum').innerText || ''}\n\n`;
+
+    // Section III: Manager Competencies (if applicable)
+    if (cat === 'Manager') {
+        csv += 'SECTION III: MANAGER PERFORMANCE EVALUATION (Weight: 25%)\n';
+        csv += 'Factor,Self Rating,Supervisor Rating,Peer 360,Average\n';
+        managerCompetencies.forEach(m => {
+            const avg = computeMgrScore(m).toFixed(2);
+            csv += `"${m.factor}",${m.self.toFixed(1)},${m.supervisor.toFixed(1)},${(m.peer360 || 0).toFixed(1)},${avg}\n`;
+        });
+        csv += `Section Score,${document.getElementById('mgr-section-sum').innerText || ''}\n\n`;
+    }
+
+    // Future Goals
+    csv += 'FUTURE STRATEGIC GOALS\n';
+    csv += 'Pillar,Reference,SMART Objective,Weight (%),Timeline\n';
+    if (futureGoals.length > 0) {
+        futureGoals.forEach(f => {
+            csv += `"${f.pillar}","${f.ref}","${f.SMART}",${f.weight},"${f.timeline}"\n`;
+        });
+    } else {
+        csv += 'No future objectives linked yet\n';
+    }
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `CARE_PA_Data_${employeeName.replace(/\s+/g, '_')}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+}
+// ==================== FINISHED - SEND TO HR ====================
+// Browsers can't attach a file to an email automatically via a mailto: link - there is no
+// web API that allows a page to reach into the OS email client and attach a file for
+// security reasons. So this does the next best thing: auto-downloads the appraisal data as a
+// CSV file, then opens a pre-filled email to HR with the recipient/subject already set,
+// the employee email in CC, and a reminder in the body to attach the CSV file that was
+// just downloaded.
+async function finishAndSendToHR() {
+    const employeeName = document.getElementById('prof-name').value.trim() || 'Employee';
+    const employeeEmail = document.getElementById('prof-email').value.trim();
+
+    const proceed = confirm(
+        `This will:\n\n1) Auto-download the appraisal data as a CSV file for ${employeeName}\n2) Open your email app with a message addressed to HR_Team@cef-eg.org\n\n` +
+        `Note: browsers can't attach files to an email automatically - please attach the CSV file that was just downloaded before you hit send.\n\nContinue?`
+    );
+    if (!proceed) return;
+
+    const btn = document.getElementById('send-to-hr-btn');
+    const originalHTML = btn ? btn.innerHTML : null;
+    if (btn) {
+        btn.innerHTML = '<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i> Preparing CSV...';
+    }
+
+    try {
+        exportToCSV();
+
+        const fileName = `CARE_PA_Data_${employeeName.replace(/\s+/g, '_')}.csv`;
+        const subject = encodeURIComponent(`PA for ${employeeName}`);
+        const body = encodeURIComponent(
+            `Hi HR Team,\n\nPlease find attached the completed Performance Appraisal data for ${employeeName}.\n\n` +
+            `Note: the CSV file ("${fileName}") was just downloaded to this computer - please attach it to this email before sending.\n\nThank you.`
+        );
+        const ccParam = employeeEmail ? `&cc=${encodeURIComponent(employeeEmail)}` : '';
+        window.location.href = `mailto:HR_Team@cef-eg.org?subject=${subject}&body=${body}${ccParam}`;
+    } finally {
+        if (btn) {
+            btn.innerHTML = originalHTML;
+            if (window.lucide) lucide.createIcons();
+        }
+    }
+}
+    </script>
+</body>
+</html>
