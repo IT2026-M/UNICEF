@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Digital Safeguarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#DDF1FF; --ink:#16324F; --soft:#4F6B86; --sun:#FFC93C; --leaf:#2BB673;
+  --berry:#E8476A; --card:#FFFFFF; --line:#BFD9EE; --ok-bg:#E3F7EC; --no-bg:#FDE8EE;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --sky:#0E2236; --ink:#EAF3FB; --soft:#A9C0D6; --sun:#FFD25E; --leaf:#46D18D;
+    --berry:#FF6F8E; --card:#17324D; --line:#2C506F; --ok-bg:#163F2E; --no-bg:#4A1E2B; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --sky:#0E2236; --ink:#EAF3FB; --soft:#A9C0D6; --sun:#FFD25E; --leaf:#46D18D;
+  --berry:#FF6F8E; --card:#17324D; --line:#2C506F; --ok-bg:#163F2E; --no-bg:#4A1E2B; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0; background:var(--sky); color:var(--ink);
+  font-family:"Baloo Bhaijaan 2","Segoe UI",Tahoma,"Noto Sans Arabic",sans-serif; font-size:1.12rem; line-height:1.6}
+main{max-width:46rem; margin:0 auto; padding:1.2rem 1rem 3rem}
+button{font:inherit; cursor:pointer; color:inherit}
+button:focus-visible,input:focus-visible{outline:4px solid var(--sun); outline-offset:3px}
+[hidden]{display:none !important}
+.big-btn{background:var(--sun); color:#16324F; border:0; border-radius:999px; padding:.7rem 2.2rem; font-size:1.3rem; font-weight:800; box-shadow:0 6px 0 #D9A21B}
+.big-btn:active{transform:translateY(4px); box-shadow:0 2px 0 #D9A21B}
+.big-btn:disabled{opacity:.5; cursor:default}
+.ghost{background:var(--card); border:3px solid var(--line); border-radius:999px; padding:.45rem 1.2rem; font-weight:700; font-size:1rem}
+.mascot{width:7.5rem; height:auto; display:block; margin:0 auto}
+.hero{position:relative; border-radius:1.6rem; overflow:hidden; padding:2rem .8rem 1.4rem; margin-bottom:1.2rem}
+.hero .mascot{display:none}
+.herobg{position:absolute; inset:0}
+.herobg svg{width:100%; height:100%; display:block}
+.herotext{position:relative; background:rgba(255,255,255,.82); border-radius:1.3rem; padding:1rem 1rem .4rem; max-width:34rem; margin:0 auto; box-shadow:0 8px 24px rgba(22,50,79,.12)}
+.herotext .invite{font-weight:700; color:var(--ink); font-size:1.12rem; margin:0 auto .9rem; padding-top:.7rem; border-top:2px dashed var(--line)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .herotext{background:rgba(14,34,54,.86)} :root:not([data-theme="light"]) .herobg{opacity:.6} }
+:root[data-theme="dark"] .herotext{background:rgba(14,34,54,.86)} :root[data-theme="dark"] .herobg{opacity:.6}
+.herokids{position:relative; display:flex; justify-content:space-between; max-width:34rem; margin:-.6rem auto -1.4rem; padding:0 1rem; pointer-events:none}
+.herokids svg{width:clamp(4.5rem,16vw,6.5rem); height:auto; display:block}
+@keyframes floaty{50%{transform:translateY(-8px)}}
+.fl{animation:floaty 4s ease-in-out infinite} .fl2{animation:floaty 5s ease-in-out infinite .8s} .fl3{animation:floaty 4.5s ease-in-out infinite 1.6s}
+@media (prefers-reduced-motion: reduce){ .fl,.fl2,.fl3{animation:none} }
+.hero{text-align:center}
+.hero h1{font-size:clamp(2rem,7vw,3rem); line-height:1.15; margin:.4rem 0 .2rem; font-weight:800}
+.hero p{color:var(--soft); max-width:32rem; margin:0 auto 1rem}
+.total{display:inline-block; background:var(--card); border-radius:999px; padding:.3rem 1.2rem; font-weight:800; margin-bottom:1.2rem}
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr)); gap:.8rem; margin-bottom:1.4rem}
+.station{background:var(--card); border:3px solid var(--tc); border-radius:1.2rem; padding:.9rem .7rem; text-align:center; display:flex; flex-direction:column; align-items:center; gap:.15rem}
+.station:hover{transform:translateY(-2px)}
+.station .ic{font-size:2rem; line-height:1.2; width:3.2rem; height:3.2rem; display:grid; place-items:center; border-radius:50%; background:var(--tc)}
+.station .tt{font-weight:800; font-size:1.05rem; line-height:1.3}
+.station .st{font-size:.9rem; color:var(--soft)}
+.station.done .st{color:var(--leaf); font-weight:700}
+.center{text-align:center}
+.small{font-size:.92rem; color:var(--soft)}
+.linkish{background:none; border:0; color:var(--soft); text-decoration:underline; font-size:.9rem; margin-top:1rem}
+.bar{display:flex; align-items:center; justify-content:space-between; gap:.8rem; margin-bottom:.8rem; flex-wrap:wrap}
+.bar h2{margin:0; font-size:1.35rem}
+.dots{display:flex; gap:.35rem}
+.dot{width:.8rem; height:.8rem; border-radius:50%; background:var(--line)}
+.dot.done{background:var(--leaf)} .dot.now{background:var(--sun); transform:scale(1.25)}
+
+/* ===== Scene stage ===== */
+.stage{position:relative; aspect-ratio:4/3; border-radius:1.4rem; overflow:hidden; color:#16324F; margin-bottom:.6rem; background:#EAF4FB}
+@media (max-width:560px){ .stage{aspect-ratio:1/1} }
+.bgsvg{position:absolute; inset:0; width:100%; height:100%}
+.chr{position:absolute; bottom:3%; transform:translateX(-50%); transition:transform .3s}
+.chr svg{width:100%; height:auto; display:block}
+.chr.speaking svg{animation:bob .5s ease-in-out infinite alternate}
+@keyframes bob{to{transform:translateY(-5px)}}
+.chr .tag{position:absolute; top:-1.5em; left:50%; transform:translateX(-50%); background:rgba(255,255,255,.9); border-radius:999px; padding:0 .55em; font-weight:800; font-size:clamp(.65rem,2.4vw,.9rem); white-space:nowrap}
+.chr.speaking .tag{background:#FFC93C}
+.bub{position:absolute; top:4%; transform:translateX(-50%); width:min(56%,22rem); background:#fff; border:3px solid #16324F; border-radius:1.1rem;
+  padding:.4rem .7rem; font-size:clamp(.8rem,2.9vw,1.1rem); line-height:1.5; font-weight:500; animation:pop .3s ease-out; direction:rtl; text-align:right; box-shadow:0 4px 0 rgba(22,50,79,.15)}
+.bub::after{content:""; position:absolute; bottom:-14px; left:var(--tail,50%); transform:translateX(-50%); border:12px solid transparent; border-top-color:#16324F; border-bottom:0}
+.bub b{display:block; font-size:.85em; color:#E8476A}
+.phone{position:absolute; top:4%; left:50%; transform:translateX(-50%); width:min(62%,20rem); background:#16324F; border-radius:1rem; padding:.35rem; animation:ring .5s ease-out; direction:rtl}
+@keyframes ring{0%{transform:translateX(-50%) scale(.7)}50%{transform:translateX(-50%) rotate(-3deg) scale(1.03)}75%{transform:translateX(-50%) rotate(2deg)}100%{transform:translateX(-50%)}}
+.phone .ph{color:#fff; font-size:clamp(.65rem,2.3vw,.85rem); font-weight:700; padding:.05rem .4rem .25rem}
+.phone .pb{background:#fff; border-radius:.7rem; padding:.45rem .55rem; font-size:clamp(.78rem,2.8vw,1.05rem); line-height:1.5; text-align:right}
+.phone .pe{font-size:clamp(1.6rem,6vw,2.4rem); text-align:center; line-height:1.2}
+.phone .pl{text-align:center; font-weight:800}
+@keyframes pop{from{transform:translateX(-50%) scale(.8);opacity:0}to{transform:translateX(-50%) scale(1);opacity:1}}
+.cap{position:absolute; inset:auto 3% 3% 3%; background:rgba(14,30,48,.88); color:#fff; border-radius:.9rem; padding:.35rem .7rem; font-size:clamp(.78rem,2.7vw,1.05rem); line-height:1.5; direction:rtl; z-index:3}
+.cap .who{color:#FFD25E; font-weight:800; margin-inline-end:.3rem}
+.overlay{position:absolute; inset:0; display:grid; place-items:center; background:rgba(14,30,48,.35); border:0; width:100%; z-index:5}
+.overlay span{background:var(--sun); color:#16324F; border-radius:999px; padding:.6rem 1.6rem; font-weight:800; font-size:clamp(1rem,3.5vw,1.3rem); box-shadow:0 5px 0 #D9A21B}
+.ctrls{display:flex; align-items:center; gap:.5rem; margin-bottom:.4rem}
+.ctrls .ghost{padding:.3rem .9rem}
+.prog{flex:1; display:flex; gap:.25rem}
+.prog i{flex:1; height:.4rem; border-radius:1rem; background:var(--line)}
+.prog i.on{background:var(--sun)}
+.vnote{font-size:.88rem; color:var(--soft); margin:0 0 .8rem}
+/* moods */
+.m,.brow,.mo{display:none}
+.mood-h .mh,.mood-w .mw,.mood-t .mt,.mood-w .brow{display:block}
+.talk .m{display:none} .talk .mo{display:block; animation:talk .25s infinite alternate; transform-origin:60px 82px}
+@keyframes talk{from{transform:scaleY(.3)}to{transform:scaleY(1)}}
+
+.question{text-align:center; font-weight:800; font-size:1.25rem; margin:.4rem 0 .7rem}
+.choices{display:grid; gap:.65rem}
+.choice{background:var(--card); border:3px solid var(--line); border-radius:1rem; padding:.75rem 1rem; text-align:right; font-size:1.08rem; font-weight:500}
+.choice:hover:not(:disabled){border-color:var(--sun)}
+.choice.right{border-color:var(--leaf); background:var(--ok-bg)}
+.choice.wrong{border-color:var(--berry); background:var(--no-bg)}
+.choice:disabled{cursor:default}
+.feedback{margin-top:.9rem; border-radius:1.1rem; padding:.9rem 1rem; display:flex; gap:.8rem; align-items:flex-start; background:var(--card); border:3px solid var(--line)}
+.feedback.good{border-color:var(--leaf)} .feedback.bad{border-color:var(--berry)}
+.feedback h3{margin:0 0 .15rem; font-size:1.2rem} .feedback p{margin:0}
+.feedback .fi{font-size:2.3rem; line-height:1}
+.next{display:block; margin:1rem auto 0}
+.panel{background:var(--card); border-radius:1.2rem; padding:1.1rem; margin-bottom:1.2rem}
+.panel h3{margin:0 0 .3rem}
+.panel p{margin:0 0 .6rem; color:var(--soft)}
+.hand{display:flex; flex-wrap:wrap; gap:.5rem}
+.hand input,.namebox input{font:inherit; font-size:1.05rem; padding:.45rem .8rem; border-radius:.8rem; border:2px solid var(--line); background:var(--sky); color:var(--ink)}
+.hand input{flex:1 1 8rem}
+.namebox{text-align:center; margin-bottom:1rem}
+.namebox label{display:block; font-weight:700; margin-bottom:.4rem}
+.namebox input{width:100%; max-width:20rem; text-align:center; font-size:1.2rem}
+.cert{background:#FFFDF5; color:#16324F; border:6px double #D9A21B; border-radius:1.4rem; padding:1.4rem 1rem; margin:0 0 1rem; text-align:center}
+.cert .ct{font-size:1rem; margin:0; color:#4F6B86}
+.cert .badge{font-size:3.4rem; line-height:1.1}
+.cert .cn{font-size:clamp(1.7rem,6vw,2.5rem); font-weight:800; margin:.2rem 0; min-height:1.3em}
+.cert .cl{font-size:1.15rem; font-weight:700; margin:.2rem 0}
+.cert .cd{font-size:.92rem; color:#4F6B86; margin:.5rem 0 0}
+.row{display:flex; gap:.7rem; justify-content:center; flex-wrap:wrap; margin-bottom:1.2rem}
+@media print{ body{background:#fff} main > *:not(#endS), #endS > *:not(#cert){display:none !important} .cert{margin-top:3rem; border-width:10px} }
+@media (prefers-reduced-motion: reduce){ .chr.speaking svg,.bub,.phone,.talk .mo{animation:none} }
+</style>
+</head>
+<body>
+<main>
+
+<section id="mapS">
+  <div class="hero">
+  <div class="herobg" aria-hidden="true">
+    <svg viewBox="0 0 800 520" preserveAspectRatio="xMidYMid slice">
+      <defs><linearGradient id="hsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BFE3FF"/><stop offset="1" stop-color="#E9F6FF"/></linearGradient></defs>
+      <rect width="800" height="520" fill="url(#hsky)"/>
+      <g stroke="#8CC4F0" stroke-width="3" stroke-dasharray="6 9" fill="none" opacity=".8">
+        <path d="M60 120 L200 70 L330 140 L470 60 L610 130 L740 80"/><path d="M90 300 L230 230 L400 270 L560 220 L720 300"/><path d="M200 70 L230 230 M470 60 L400 270 M610 130 L560 220"/>
+      </g>
+      <g fill="#fff" stroke="#8CC4F0" stroke-width="3"><circle cx="60" cy="120" r="9"/><circle cx="200" cy="70" r="9"/><circle cx="330" cy="140" r="9"/><circle cx="470" cy="60" r="9"/><circle cx="610" cy="130" r="9"/><circle cx="740" cy="80" r="9"/><circle cx="230" cy="230" r="9"/><circle cx="400" cy="270" r="9"/><circle cx="560" cy="220" r="9"/><circle cx="90" cy="300" r="9"/><circle cx="720" cy="300" r="9"/></g>
+      <g opacity=".35"><path d="M400 120 L520 160 V260 C520 340 465 395 400 420 C335 395 280 340 280 260 V160Z" fill="#2BB673"/><path d="M350 270 L390 310 L460 230" stroke="#fff" stroke-width="18" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+      <g class="fl"><rect x="40" y="170" width="70" height="58" rx="10" fill="#FFC93C"/><path d="M55 170 V150 A20 20 0 0 1 95 150 V170" stroke="#16324F" stroke-width="9" fill="none"/><circle cx="75" cy="195" r="8" fill="#16324F"/><rect x="71" y="197" width="8" height="16" rx="3" fill="#16324F"/></g>
+      <g class="fl2"><path d="M640 170 h110 a16 16 0 0 1 16 16 v50 a16 16 0 0 1 -16 16 h-70 l-22 22 v-22 h-18 a16 16 0 0 1 -16 -16 v-50 a16 16 0 0 1 16 -16Z" fill="#fff" stroke="#16324F" stroke-width="4"/><path d="M695 236 C670 218 672 196 688 196 C696 196 700 204 700 204 C700 204 704 196 712 196 C728 196 730 218 705 236 Z" fill="#E8476A" transform="translate(-5 -12)"/></g>
+      <g class="fl3" fill="none" stroke="#2B7FD9" stroke-width="9" stroke-linecap="round"><path d="M160 40 a60 60 0 0 1 84 0"/><path d="M176 58 a36 36 0 0 1 52 0"/><circle cx="202" cy="78" r="6" fill="#2B7FD9" stroke="none"/></g>
+      <g class="fl"><path d="M575 40 l9 18 20 3 -14 14 3 20 -18 -9 -18 9 3 -20 -14 -14 20 -3Z" fill="#FFC93C" stroke="#D9A21B" stroke-width="3"/></g>
+      <g class="fl2"><circle cx="110" cy="420" r="34" fill="#7FE0AE" stroke="#16324F" stroke-width="4"/><path d="M76 420 h68 M110 386 c-18 20 -18 48 0 68 M110 386 c18 20 18 48 0 68" stroke="#16324F" stroke-width="4" fill="none"/></g>
+      <g transform="translate(560 330)" display="none">
+        <rect x="20" y="110" width="80" height="90" rx="30" fill="#E8476A"/><circle cx="60" cy="72" r="36" fill="#F2C29B"/>
+        <circle cx="22" cy="70" r="12" fill="#5A3825"/><circle cx="98" cy="70" r="12" fill="#5A3825"/><path d="M24 70 C24 34 96 34 96 70 C88 52 32 52 24 70Z" fill="#5A3825"/>
+        <circle cx="48" cy="74" r="4.5" fill="#16324F"/><circle cx="72" cy="74" r="4.5" fill="#16324F"/><path d="M49 88 Q60 98 71 88" stroke="#16324F" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <rect x="30" y="120" width="60" height="44" rx="6" fill="#16324F"/><rect x="35" y="125" width="50" height="34" rx="3" fill="#BFE3FF"/><path d="M52 142 l6 6 12 -12" stroke="#2BB673" stroke-width="4" fill="none" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(150 340)" display="none">
+        <rect x="20" y="110" width="80" height="90" rx="30" fill="#2B7FD9"/><circle cx="60" cy="72" r="36" fill="#C88B5E"/>
+        <path d="M25 68 C22 32 98 32 95 68 C86 50 34 48 25 68Z" fill="#2F2A26"/>
+        <circle cx="48" cy="74" r="4.5" fill="#16324F"/><circle cx="72" cy="74" r="4.5" fill="#16324F"/><path d="M49 88 Q60 98 71 88" stroke="#16324F" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <rect x="46" y="116" width="30" height="50" rx="6" fill="#16324F"/><rect x="50" y="121" width="22" height="38" rx="3" fill="#FFE7A3"/><path d="M61 130 L69 133 V140 C69 146 65 149 61 151 C57 149 53 146 53 140 V133Z" fill="#2BB673"/>
+      </g>
+    </svg>
+  </div>
+  <div class="herotext">
+    <svg class="mascot" viewBox="0 0 120 130" aria-hidden="true">
+      <path d="M60 6 L108 22 V62 C108 94 86 116 60 126 C34 116 12 94 12 62 V22 Z" fill="#2BB673"/>
+      <path d="M60 16 L98 29 V62 C98 88 81 106 60 115 C39 106 22 88 22 62 V29 Z" fill="#7FE0AE"/>
+      <circle cx="45" cy="58" r="8" fill="#16324F"/><circle cx="75" cy="58" r="8" fill="#16324F"/>
+      <circle cx="47" cy="55" r="2.5" fill="#fff"/><circle cx="77" cy="55" r="2.5" fill="#fff"/>
+      <path d="M44 78 Q60 92 76 78" stroke="#16324F" stroke-width="5" fill="none" stroke-linecap="round"/>
+    </svg>
+    <h1 dir="ltr">Digital Safeguarding</h1>
+    <p style="font-weight:800;font-size:1.3rem;color:var(--ink);margin:-.2rem auto .5rem">الحماية الرقمية للأطفال</p>
+    <p>الإنترنت عالم كبير وجميل، بنتعلم ونلعب ونتكلم فيه مع صحابنا. وزي ما بنحمي نفسنا في الشارع، لازم نحمي نفسنا على النت كمان. افتكر دايمًا: معلوماتك الشخصية ليك إنت بس، وأي سر يضايقك لازم تحكيه، ولو أي حاجة خوّفتك أو ضايقتك، احكي لكبير بتثق فيه. وده عمره ما هيكون غلطك.</p>
+    <p class="invite">انضموا إلينا في رحلة ممتعة نستكشف فيها مواقف حقيقية من عالمنا الرقمي، ونختار معًا التصرف الأذكى والأكثر أمانًا. وفي نهاية الرحلة، يحصل الفائزون على شهادة تقدير وهدية مميزة. 🎓🎁</p>
+    <div class="total" id="total"></div>
+  </div>
+  <div class="herokids" aria-hidden="true">
+    <svg viewBox="0 0 120 170"><rect x="20" y="110" width="80" height="70" rx="30" fill="#2B7FD9"/><circle cx="60" cy="72" r="36" fill="#C88B5E"/><path d="M25 68 C22 32 98 32 95 68 C86 50 34 48 25 68Z" fill="#2F2A26"/><circle cx="48" cy="74" r="4.5" fill="#16324F"/><circle cx="72" cy="74" r="4.5" fill="#16324F"/><path d="M49 88 Q60 98 71 88" stroke="#16324F" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="46" y="116" width="30" height="50" rx="6" fill="#16324F"/><rect x="50" y="121" width="22" height="38" rx="3" fill="#FFE7A3"/><path d="M61 130 L69 133 V140 C69 146 65 149 61 151 C57 149 53 146 53 140 V133Z" fill="#2BB673"/></svg>
+    <svg viewBox="0 0 120 170"><rect x="20" y="110" width="80" height="70" rx="30" fill="#E8476A"/><circle cx="60" cy="72" r="36" fill="#F2C29B"/><circle cx="22" cy="70" r="12" fill="#5A3825"/><circle cx="98" cy="70" r="12" fill="#5A3825"/><path d="M24 70 C24 34 96 34 96 70 C88 52 32 52 24 70Z" fill="#5A3825"/><circle cx="48" cy="74" r="4.5" fill="#16324F"/><circle cx="72" cy="74" r="4.5" fill="#16324F"/><path d="M49 88 Q60 98 71 88" stroke="#16324F" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="30" y="120" width="60" height="44" rx="6" fill="#16324F"/><rect x="35" y="125" width="50" height="34" rx="3" fill="#BFE3FF"/><path d="M52 142 l6 6 12 -12" stroke="#2BB673" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+  </div></div>
+  <div class="grid" id="grid"></div>
+  <div class="center">
+    <button class="big-btn" id="certBtn">🎓 شهادتي</button>
+    <p class="small" id="certHint"></p>
+    <button class="linkish" id="reset">ابدأ من الأول (امسح النجوم)</button>
+  </div>
+</section>
+
+<section id="playS" hidden>
+  <div class="bar">
+    <button class="ghost" id="back">→ المحطات</button>
+    <h2 id="tTitle"></h2>
+    <div class="dots" id="dots"></div>
+  </div>
+  <div class="stage" id="stage" dir="ltr">
+    <div id="bg"></div>
+    <div id="cast"></div>
+    <div id="top" aria-live="polite"></div>
+    <div class="cap" id="cap" hidden></div>
+    <button class="overlay" id="overlay"><span>▶ شوف الموقف</span></button>
+  </div>
+  <div class="ctrls">
+    <button class="ghost" id="pp" aria-label="تشغيل أو إيقاف">▶</button>
+    <button class="ghost" id="replay" aria-label="إعادة">🔁</button>
+    <div class="prog" id="prog"></div>
+    <button class="ghost" id="voice" aria-label="الصوت">🔊</button>
+  </div>
+  <p class="vnote" id="vnote" hidden></p>
+  <div id="qa" hidden>
+    <p class="question" id="question"></p>
+    <div class="choices" id="choices"></div>
+    <div id="fb" aria-live="polite"></div>
+    <button class="big-btn next" id="next" hidden>اللي بعده</button>
+  </div>
+  <div id="topicEnd" class="center" hidden>
+    <div style="font-size:3.5rem" id="teIcon"></div>
+    <h2 id="teTitle" style="margin:.2rem 0"></h2>
+    <p class="small" id="teScore" style="font-size:1.2rem"></p>
+    <div class="row"><button class="big-btn" id="teBack">المحطة اللي بعدها</button><button class="ghost" id="teAgain">العب المحطة تاني</button></div>
+  </div>
+</section>
+
+<section id="endS" hidden>
+  <div class="row" style="justify-content:flex-start"><button class="ghost" id="back2">→ المحطات</button></div>
+  <div class="namebox"><label for="kidName">اكتب اسمك عشان تاخد شهادتك 🎓</label><input id="kidName" placeholder="اسمك هنا" autocomplete="off"></div>
+  <div class="cert" id="cert">
+    <p class="ct">شهادة <span dir="ltr">Digital Safeguarding</span></p>
+    <div class="badge" id="badge"></div>
+    <p class="cn" id="certName">…</p>
+    <p class="cl" id="certLevel"></p>
+    <p class="cd" id="certDate"></p>
+  </div>
+  <div class="row"><button class="ghost" id="printBtn">🖨️ اطبع الشهادة</button></div>
+  <p class="small center" style="margin-top:-.6rem">لو الطباعة مااشتغلتش، خد سكرين شوت للشهادة.</p>
+  <div class="panel">
+    <h3>إيد الأمان بتاعتي ✋</h3>
+    <p>اكتب أسماء ٥ كبار تقدر تحكيلهم أي حاجة.</p>
+    <div class="hand">
+      <input aria-label="الشخص الأول" placeholder="مثلًا: ماما"><input aria-label="الشخص التاني" placeholder="مثلًا: بابا">
+      <input aria-label="الشخص التالت" placeholder="مثلًا: الميسّرة"><input aria-label="الشخص الرابع" placeholder="…"><input aria-label="الشخص الخامس" placeholder="…">
+    </div>
+  </div>
+  <div class="panel"><h3>لو حصلك أي حاجة ضايقتك 📣</h3><p id="hubText" style="color:var(--ink)"></p></div>
+  <p class="small center">للأهل والميسّرين: بعد كل محطة اسألوا الطفل «لو ده حصل بجد، هتيجي تقولّي؟» وطمّنوه إنه مش هيتعاقب لما يحكي.</p>
+</section>
+</main>
+
+<script>
+/* ✏️ عدّل قنوات الشكوى هنا حسب مركز التعلم بتاعك */
+const HUB = "كلّم الميسّر أو الميسّرة في مركز التعلم، أو اكتب في صندوق الشكاوى، أو اتصل بخط نجدة الطفل ١٦٠٠٠.";
+
+const NAMES={s:"سلمى",y:"يوسف",n:"نور",k:"كريم",m:"مروان"};
+const PITCH={s:1.4,n:1.28,y:1.15,k:1.02,m:.92,N:1};
+
+/* Beat format:  "<char>|<mood h/w/t>|text"  ·  "N|narration"  ·  "O|sender|message"  ·  "P|emoji|label|narration" */
+const T = [
+{id:"pass", t:"الباسورد", ic:"🔑", c:"#FFE7A3", qs:[
+ {set:"room", cast:"sn", h:"s", b:["N|سلمى ونور قاعدين في الأوضة، وسلمى بتعمل حساب في لعبة جديدة.","s|h|محتاجة باسورد… هكتب salma2015، اسمي وسنة ميلادي، سهل!","n|w|استني يا سلمى! ده أي حد يعرفك هيخمّنه على طول.","P|🔐|اختار باسورد|اللعبة بتطلب باسورد قوي.","s|t|طب أكتب إيه؟"],
+  q:"أنهي باسورد أقوى لسلمى؟", c:[["salma2015",0],["123456",0],["Qamar!Ba7r#27",1]],
+  ok:"صح! الباسورد القوي طويل، وفيه حروف كبيرة وصغيرة وأرقام ورموز، ومافيهوش اسمك ولا تاريخ ميلادك.",
+  no:"الباسورد ده سهل يتخمّن. الباسورد القوي طويل، وفيه حروف وأرقام ورموز، ومافيهوش اسمك ولا تاريخ ميلادك."},
+ {set:"yard", cast:"yk", h:"y", b:["N|في الفسحة، كريم جري على يوسف.","k|h|يا يوسف، قولّي الباسورد بتاعك، هعدّيلك المرحلة اللي واقف فيها!","y|t|بجد؟ أنا بقالي أسبوع مش عارف أعدّيها…","k|h|يلا قولّي بسرعة قبل الجرس ما يضرب!"],
+  q:"يوسف يعمل إيه؟", c:[["يقوله، ده صاحبه",0],["يقوله لا بلطف، الباسورد سر",1],["يقوله نص الباسورد بس",0]],
+  ok:"برافو! الباسورد زي مفتاح البيت، مابنديهوش لحد غير بابا وماما، حتى لو صاحبنا.",
+  no:"الباسورد زي مفتاح البيت. حتى صاحبك مايصحش ياخده، ممكن يغيّر حاجات في حسابك أو يدّيه لحد تاني."},
+ {set:"room", cast:"sy", h:"s", b:["y|w|سلمى! سمعتي إن لعبة المزرعة بيانات اللاعبين بتاعتها اتسرقت؟","s|w|يا خبر! أنا بلعبها… وكمان بستخدم نفس الباسورد في كل حساباتي.","y|t|يعني كل حساباتك ممكن تتفتح؟","s|w|طب أعمل إيه دلوقتي؟"],
+  q:"سلمى تعمل إيه؟", c:[["ماتعملش حاجة، يمكن مايحصلش حاجة",0],["تغيّر الباسوردات بمساعدة كبير، وتخلي لكل حساب باسورد مختلف",1],["تمسح كل حساباتها وماتلعبش تاني",0]],
+  ok:"ممتاز! لو باسورد واحد اتعرف، الباسوردات المختلفة بتحمي باقي حساباتك.",
+  no:"لما الباسورد يبقى واحد، لو اتعرف مرة كل الحسابات بتتفتح. الحل إن كل حساب يبقى له باسورد مختلف."},
+ {set:"home", cast:"ym", h:"y", b:["N|يوسف ومروان بيلعبوا سوا، ووصلت رسالة على موبايل يوسف.","O|فريق دعم اللعبة ✅|حسابك هيتقفل النهارده! ابعت الباسورد عشان نثبت إنه حسابك.","m|w|إلحق يا يوسف! ابعت بسرعة قبل ما يتقفل!","y|t|بس هما ليه محتاجين الباسورد بتاعي؟"],
+  q:"يوسف يعمل إيه؟", c:[["يبعت الباسورد بسرعة",0],["مايبعتش، ويوري الرسالة لكبير",1],["يبعت رقم تليفونه بدل الباسورد",0]],
+  ok:"صح! الشركات الحقيقية عمرها ما بتطلب الباسورد، والرسايل اللي بتخوّفك وتستعجلك غالبًا نصب.",
+  no:"الشركات الحقيقية عمرها ما بتطلب الباسورد. الرسالة دي بتحاول تخوّفك عشان تسرق حسابك."}
+]},
+{id:"links", t:"اللينكات", ic:"🔗", c:"#C9E8FF", qs:[
+ {set:"room", cast:"sn", h:"s", b:["N|سلمى ونور بيذاكروا، ووصلت رسالة على تابلت سلمى.","O|رقم غريب|مبروووك 🎉 كسبتي تابلت جديد! دوسي على اللينك بسرعة قبل العرض ما يخلص!","s|h|نور! أنا كسبت تابلت!","n|t|كسبتيه إزاي؟ إنتي دخلتي مسابقة أصلًا؟","s|t|لأ… بس مكتوب «بسرعة»!"],
+  q:"سلمى تعمل إيه؟", c:[["تدوس بسرعة قبل العرض ما يخلص",0],["تبعت اللينك لصحابها",0],["ماتدوسش، وتوري الرسالة لكبير",1]],
+  ok:"صح! الجوايز اللي بتستعجلك غالبًا فخ عشان يسرقوا بياناتك أو يحطوا فيروس.",
+  no:"الرسايل اللي فيها «كسبت» و«بسرعة» غالبًا فخ. ماتدوسش، واسأل كبير الأول."},
+ {set:"class", cast:"yk", h:"y", b:["O|حساب مجهول|إلحق! 😱 إنت في الفيديو ده، شوف بنفسك 👇🔗","y|w|كريم، بص! بيقولوا أنا في فيديو!","k|w|فيديو إيه؟ دوس نشوف!","y|t|استنى… أنا ماأعرفش مين ده أصلًا."],
+  q:"يوسف يعمل إيه؟", c:[["يدوس عشان يعرف الفيديو فيه إيه",0],["مايدوسش، ويوري الرسالة لكبير",1],["يرد ويسأله: إنت مين؟",0]],
+  ok:"شاطر! الرسايل اللي بتقلقك معمولة عشان تدوس من غير تفكير.",
+  no:"دي حيلة معروفة: يقلقوك عشان تدوس بسرعة. ماتدوسش ولا ترد، واحكي لكبير."},
+ {set:"home", cast:"sm", h:"s", b:["N|سلمى قاعدة مع أخوها مروان، ووصلتها رسالة من صاحبتها نور.","O|نور|جرّبي ده 😂😂 🔗","s|t|غريبة… نور عمرها ما بتكتب كده ولا بتبعت لينكات.","m|h|دي صاحبتك، دوسي عادي!"],
+  q:"سلمى تعمل إيه؟", c:[["تدوس، دي صاحبتها",0],["تسأل نور بطريقة تانية، أو تسأل كبير قبل ما تدوس",1],["تبعته لكل الجروب",0]],
+  ok:"تفكير ذكي! أحيانًا حساب صاحبك نفسه بيتسرق، وحد تاني بيبعت منه لينكات.",
+  no:"حتى لو اللينك من صاحبك، لو الرسالة غريبة يبقى ممكن حسابه اتسرق. اسأله أو اسأل كبير الأول."}
+]},
+{id:"info", t:"معلوماتي الشخصية", ic:"🏠", c:"#D7F5E4", qs:[
+ {set:"room", cast:"yk", h:"y", b:["N|يوسف بيوري كريم شات مع حد عرفه من يومين.","O|حد ماتعرفوش|أنا عندي ١٠ سنين زيك 😊 إنت ساكن فين بالظبط؟","k|t|هو بيسأل عن بيتكم ليه؟","y|t|شكله لطيف… أقوله؟"],
+  q:"يوسف يعمل إيه؟", c:[["يقوله عنوانه",0],["يقوله اسم مدرسته بس",0],["مايقولش، ويحكي لبابا أو ماما",1]],
+  ok:"برافو! مانعرفش مين ورا الشاشة بجد، وعنوانك ومدرستك معلومات خاصة.",
+  no:"مانعرفش مين ورا الشاشة بجد، حتى لو قال إنه في سنك. العنوان والمدرسة معلومات خاصة."},
+ {set:"room", cast:"sn", h:"s", b:["n|h|سلمى، شوفي المسابقة دي! الجايزة موبايل!","P|🏆|مسابقة|اكتب اسمك بالكامل، ورقم تليفونك، واسم مدرستك عشان تكسب!","s|h|يلا نملاها بسرعة!","n|t|استني… هما عايزين كل الحاجات دي ليه؟"],
+  q:"سلمى تعمل إيه؟", c:[["تملا كل البيانات",0],["تملا الاسم والمدرسة بس",0],["ماتملاش حاجة، وتسأل كبير الأول",1]],
+  ok:"صح! بياناتك الشخصية غالية، ومش أي موقع يستاهل ياخدها.",
+  no:"المسابقات دي ممكن تكون طريقة لجمع بيانات الأطفال. اسأل كبير قبل ما تكتب أي حاجة عن نفسك."},
+ {set:"room", cast:"ym", h:"y", b:["N|يوسف هيعمل لايف وهو بيلعب، بموافقة أهله، ومروان بيساعده.","m|t|يوسف، إنت لابس تيشيرت المدرسة، واسمها باين قوي!","y|h|عادي، محدش هياخد باله.","m|w|لأ، ده أي حد بيتفرج هيعرف إنت في مدرسة إيه."],
+  q:"إيه الأحسن يوسف يعمله؟", c:[["يبدأ عادي",0],["يغيّر التيشيرت ويتأكد إن مفيش حاجة بتبيّن مدرسته أو بيته",1],["يقول اسم المدرسة عشان صحابه يعرفوه",0]],
+  ok:"شاطر! الحاجات اللي عليك أو وراك في الكاميرا ممكن تقول للناس إنت فين.",
+  no:"أي حد بيتفرج ممكن يعرف مدرستك من التيشيرت. خبّي أي حاجة بتبيّن مكانك."},
+ {set:"yard", cast:"snk", h:"s", b:["k|h|نزّلت تطبيق جديد، تعالوا نشارك أماكننا مع بعض!","P|📍|شارك موقعك|عايزة تشاركي مكانك مع كل أصحابك؟","n|t|بس القايمة دي فيها ناس كتير إحنا مانعرفهمش.","s|t|أوافق ولا لأ؟"],
+  q:"سلمى تعمل إيه؟", c:[["توافق، عادي",0],["ترفض، وماتشاركش مكانها غير مع أهلها",1],["توافق ساعة واحدة بس",0]],
+  ok:"صح! مكانك من أخص المعلومات، وبيتشارك مع أهلك بس.",
+  no:"مكانك معلومة خاصة جدًا. ماتشاركهوش مع ناس ماتعرفهمش في الحقيقة."}
+]},
+{id:"strangers", t:"الغُرب على النت", ic:"🕵️", c:"#E6DEFF", qs:[
+ {set:"room", cast:"yk", h:"y", b:["O|آدم المحترف ⭐|أهلًا! أنا في سنك وبحب نفس اللعبة 😎 اقبل طلب الصداقة!","k|h|ده شكله محترف! اقبله، هيعلّمنا حركات.","y|t|بس أنا ماأعرفوش في الحقيقة…"],
+  q:"يوسف يعمل إيه؟", c:[["يقبل، شكله في سنه",0],["مايقبلش، لأنه مايعرفوش في الحقيقة",1],["يقبل ويسأله عن نفسه",0]],
+  ok:"صح! الصورة والاسم على النت ممكن يكونوا مش حقيقيين. الأصحاب أونلاين يبقوا ناس تعرفهم بجد.",
+  no:"مش كل حد على النت هو اللي بيقوله. ماتقبلش غير الناس اللي تعرفهم في الحقيقة."},
+ {set:"yard", cast:"sn", h:"s", b:["s|h|نور، أنا هقابل صاحبتي اللي بلعب معاها أونلاين بكرة في الجنينة!","n|t|إنتي شفتيها قبل كده؟","s|t|لأ… بس بقالنا شهر بنلعب. وهي قالتلي ماأقولش لأهلي.","n|w|وليه ماتقوليش لأهلك؟"],
+  q:"سلمى تعمل إيه؟", c:[["تروح، دي صاحبتها خلاص",0],["ماتروحش، وتقول لأهلها فورًا",1],["تروح ومعاها نور",0]],
+  ok:"قرار ذكي! ماينفعش نقابل حد عرفناه من النت من غير أهلنا أبدًا.",
+  no:"لأ أبدًا. حتى لو بقالكم وقت، ماينفعش تقابليها من غير أهلك. وطلب إنك تخبي ده علامة خطر."},
+ {set:"home", cast:"ym", h:"y", b:["O|لاعب مجهول|تعالى نكمل كلام في أبلكيشن تاني، محدش هيشوفنا هناك 🤫","m|t|مين ده يا يوسف؟","y|t|واحد بلعب معاه… عايزني أروح أبلكيشن تاني.","m|w|وليه عايز محدش يشوفكم؟"],
+  q:"يوسف يعمل إيه؟", c:[["يروح الأبلكيشن التاني",0],["يرفض، ويحكي لكبير بيثق فيه",1],["يروح بس مايقولش حاجة مهمة",0]],
+  ok:"إنت بطل! لما حد يحاول ياخدك لمكان «محدش يشوفنا فيه»، ده علامة خطر.",
+  no:"«محدش هيشوفنا» دي علامة خطر كبيرة. ارفض واحكي لكبير بتثق فيه."},
+ {set:"room", cast:"sn", h:"s", b:["s|h|في حد على النت بيقولي إني أذكى من كل صحابي، وإن أهلي مش فاهميني زيه.","n|w|وبيقول إيه كمان؟","s|t|وبيقولي نخلي كلامنا سر…","n|w|سر؟ أنا مش مرتاحة للكلام ده خالص."],
+  q:"سلمى تعمل إيه؟", c:[["تصدّقه، هو الوحيد اللي فاهمها",0],["تحكي لكبير بتثق فيه، لأن الصاحب الحقيقي مايبعدكش عن أهلك",1],["تكمل كلام معاه بس بحذر",0]],
+  ok:"صح! اللي يمدح فيك كتير ويحاول يبعدك عن أهلك ويطلب سر، ده مش صاحب.",
+  no:"الكلام الحلو مع «خلي ده سر» و«أهلك مش فاهمينك» علامة خطر. احكي لكبير بتثق فيه."}
+]},
+{id:"bully", t:"التنمر الإلكتروني", ic:"🛑", c:"#FFD6DE", qs:[
+ {set:"class", cast:"yk", h:"y", b:["O|جروب الفصل|شوفوا الصورة دي لمروان 😂😂 ابعتوها لكل الناس!","k|h|ههههه! ابعتها يا يوسف، كل الفصل بيبعتها!","y|w|بس مروان أكيد هيزعل…","k|h|يا عم ده هزار!"],
+  q:"يوسف يعمل إيه؟", c:[["يضحك ويبعتها",0],["يسكت ومايعملش حاجة",0],["مايبعتهاش، ويقف جنب مروان، ويقول لكبير",1]],
+  ok:"قلبك جميل! التنمر بيوجع حتى لو على النت، والوقوف جنب صاحبك شجاعة.",
+  no:"التنمر بيوجع حتى لو على النت. الأحسن ماتبعتهاش، وتقف جنب مروان وتقول لكبير."},
+ {set:"room", cast:"sn", h:"s", b:["n|t|مالك يا سلمى؟ شكلك زعلانة.","s|w|من أسبوع بتجيلي رسايل وحشة من حساب مجهول. بصي!","O|حساب مجهول|إنتي وحشة ومحدش بيحبك 😠","n|w|ده وحش قوي! هتعملي إيه؟"],
+  q:"سلمى تعمل إيه؟", c:[["ترد عليه بكلام أوحش",0],["تمسح الرسايل وتسكت",0],["ماتردش، تاخد سكرين شوت، تعمل بلوك، وتحكي لكبير",1]],
+  ok:"ممتاز! السكرين شوت دليل، والبلوك بيوقفه، والكبير هيساعدك. والكلام ده مش حقيقي عنك.",
+  no:"الرد بيخليه يكمّل، والمسح بيضيّع الدليل. الأحسن: سكرين شوت، بلوك، وتحكي لكبير."},
+ {set:"class", cast:"ykm", h:"y", b:["k|h|ههه يا مروان رسمك وحش، وكل يوم هقولك كده!","m|w|بطّل يا كريم، قلتلك ده بيضايقني.","k|h|يا عم بهزر!","N|يوسف بيتفرج، ومش عارف ده هزار ولا لأ."],
+  q:"اللي كريم بيعمله ده إيه؟", c:[["هزار عادي",0],["تنمر، لأنه بيتريق عليه كل مرة وهو قاله بطّل",1],["مش مشكلة طالما مفيش ضرب",0]],
+  ok:"صح! التنمر لما حد يضايق حد تاني بقصد ويكرر ده، حتى لما يطلب منه يبطّل. وده بيحصل في الفصل وعلى النت.",
+  no:"الهزار بيضحّك الكل. لكن لما حد يتريق على حد مرة ورا مرة وهو قاله بطّل، ده تنمر."}
+]},
+{id:"photos", t:"الصور والفيديوهات", ic:"📷", c:"#FFE0C7", qs:[
+ {set:"home", cast:"ym", h:"y", b:["y|h|بص الصورة دي يا مروان، هنزّلها على صفحتي!","P|🏢|الصورة|يوسف قدام البيت، وباين اسم الشارع ورقم العمارة.","m|t|حلوة… بس باين فيها عنواننا!"],
+  q:"يوسف يعمل إيه؟", c:[["ينزّلها زي ما هي",0],["يختار صورة تانية مافيهاش مكانه",1],["ينزّلها للكل مش لصحابه بس",0]],
+  ok:"شاطر! الصور ممكن تكشف مكانك من غير ما تاخد بالك.",
+  no:"الصورة دي بتقول لأي حد إنت ساكن فين. اختار صورة مافيهاش مكانك."},
+ {set:"class", cast:"sk", h:"s", b:["s|h|هههه بص يا كريم، صورة نور وهي نايمة في الأتوبيس في الرحلة!","k|h|هههه! نزّليها، الكل هيضحك!","s|t|بس نور ماتعرفش إني صوّرتها…"],
+  q:"سلمى تعمل إيه؟", c:[["تنزّلها، دي مجرد صورة",0],["تستأذن نور الأول، ولو قالت لا ماتنزّلهاش",1],["تنزّلها وتمسحها لو نور زعلت",0]],
+  ok:"قلبك جميل! صور الناس ملكهم، ولازم نستأذن قبل ما ننزّلها.",
+  no:"اللي بيتنزّل على النت ممكن يفضل موجود حتى لو اتمسح. لازم نستأذن صاحب الصورة الأول."},
+ {set:"home", cast:"ym", h:"y", b:["O|لاعب|ابعتلي صورة خاصة ليك، وماتقولش لحد إننا بنتكلم 🤫","m|t|مين ده اللي بيكلمك؟","y|w|لاعب في اللعبة… أنا مش مرتاح للكلام ده."],
+  q:"يوسف يعمل إيه؟", c:[["يبعت صورة واحدة بس",0],["يبعت ويحافظ على السر",0],["يرفض أبدًا، ويحكي لكبير بيثق فيه",1]],
+  ok:"إنت بطل! محدش من حقه يطلب منك صور خاصة، وطلب السر علامة إنك لازم تحكي فورًا.",
+  no:"ماتبعتش صور خاصة لأي حد أبدًا، و«ماتقولش لحد» علامة خطر. احكي لكبير، ومش هتبقى غلطان."}
+]},
+{id:"content", t:"محتوى مش مناسب", ic:"🙈", c:"#D9F1F5", qs:[
+ {set:"room", cast:"sn", h:"s", b:["N|سلمى ونور بيتفرجوا على فيديوهات.","P|📺|فيديو|فجأة ظهر فيديو مخيف وحش.","n|w|إيه ده؟! أنا خفت!","s|w|وأنا كمان… مش هعرف أنام النهارده."],
+  q:"سلمى تعمل إيه؟", c:[["تكمّله للآخر",0],["تقفله وتخبي إنها شافته",0],["تقفله، وتحكي لكبير بتثق فيه",1]],
+  ok:"صح جدًا! لما تحكي هترتاحي، وإنتي ماعملتيش حاجة غلط.",
+  no:"مش لازم تشيلي الخوف لوحدك. اقفليه واحكي لكبير بتثقي فيه، وإنتي ماعملتيش حاجة غلط."},
+ {set:"home", cast:"ym", h:"y", b:["y|h|تعالى نتفرج على حلقة الكرتون الجديدة.","P|⚠️|حاجة غريبة|فجأة ظهرت صورة مش مناسبة للأطفال.","m|w|إيه ده؟!","y|w|أنا ماكنتش بدوّر على كده… لو قلت لماما هتزعقلي؟"],
+  q:"يوسف يعمل إيه؟", c:[["يكمل يتفرج",0],["يقفل، ويحكي لكبير، وده مش غلطه",1],["يقفل ويسكت عشان مايتعاقبش",0]],
+  ok:"صح! إنت ماعملتش حاجة غلط. لما تحكي، الكبير يقدر يظبط الجهاز عشان مايتكررش.",
+  no:"ده مش غلطك أبدًا. اقفل واحكي لكبير، عشان يساعدك ويظبط الجهاز."}
+]},
+{id:"games", t:"الألعاب والشات", ic:"🎮", c:"#E2F0C8", qs:[
+ {set:"room", cast:"sn", h:"s", b:["N|سلمى ونور بيلعبوا لعبة أونلاين فيها شات.","O|لاعب في اللعبة|إنتي في مدرسة إيه؟ وساكنة في أنهي منطقة؟","n|t|هو بيسأل الأسئلة دي ليه؟","s|t|إحنا بنلعب سوا بس…"],
+  q:"سلمى تعمل إيه؟", c:[["تقوله المنطقة بس",0],["ماتقولش، وتتكلم عن اللعبة بس",1],["تقوله وتسأله هو ساكن فين",0]],
+  ok:"شاطرة! في شات اللعبة بنتكلم عن اللعبة وبس.",
+  no:"شات اللعبة مش مكان لمعلوماتك الشخصية. اتكلمي عن اللعبة وبس."},
+ {set:"yard", cast:"yk", h:"y", b:["O|لاعب محترف 🏅|هبعتلك سكين نادر ببلاش 🎁 بس اديني اسم حسابك والباسورد.","k|h|سكين نادر؟! ده أنا نفسي فيه من زمان! اديله يا يوسف!","y|t|بس ليه محتاج الباسورد؟"],
+  q:"يوسف يعمل إيه؟", c:[["يديله البيانات عشان الهدية",0],["يرفض، الهدية الحقيقية مش محتاجة باسورد",1],["يديله اسم الحساب بس",0]],
+  ok:"ممتاز! محدش محتاج الباسورد عشان يبعتلك هدية، ده نصب.",
+  no:"الهدية الحقيقية مش محتاجة باسورد. ده نصب عشان يسرقوا حسابك."},
+ {set:"room", cast:"sn", h:"s", b:["s|h|في لاعب بيبعتلي هدايا كتير في اللعبة كل يوم!","O|لاعب|أنا اديتك هدايا كتير 🎁 دلوقتي لازم تعمليلي خدمة، وماتقوليش لحد.","n|w|خدمة إيه؟ وليه ماتقوليش لحد؟","s|w|حاسة إني لازم أرد الجميل…"],
+  q:"سلمى تعمل إيه؟", c:[["تعمل الخدمة عشان الهدايا",0],["ماتعملش حاجة، وتحكي لكبير بتثق فيه",1],["ترجعله الهدايا وتسكت",0]],
+  ok:"صح! الهدية الحقيقية مالهاش تمن. اللي يطلب مقابل وسر، لازم الكبار يعرفوا.",
+  no:"الهدايا مش بتخليكي مدينة لحد. لما الهدية يجي بعدها طلب وسر، احكي لكبير فورًا."}
+]},
+{id:"apps", t:"التطبيقات والتحميل", ic:"📲", c:"#FCE1F4", qs:[
+ {set:"home", cast:"yk", h:"y", b:["k|h|يوسف! لقيت موقع بينزّل اللعبة الغالية دي ببلاش!","P|🌐|موقع غريب|«حمّل اللعبة ببلاش من هنا!»","y|t|ببلاش؟ بس ده مش المتجر…"],
+  q:"يوسف يعمل إيه؟", c:[["يحمّلها من الموقع ده",0],["يحمّل من المتجر الرسمي بس، وبعد موافقة كبير",1],["يحمّلها ويمسحها لو حصلت مشكلة",0]],
+  ok:"صح! المواقع الغريبة ممكن تحط فيروسات أو تسرق بياناتك.",
+  no:"الحاجات المجانية من مواقع غريبة ممكن يكون فيها فيروس. المتجر الرسمي وبموافقة كبير."},
+ {set:"room", cast:"sn", h:"s", b:["s|h|نزّلت تطبيق كشاف نور، شوفي!","P|🔦|التطبيق بيطلب إذن|الكاميرا، والميكروفون، وجهات الاتصال، والموقع.","n|t|كشاف… محتاج كل ده ليه؟"],
+  q:"سلمى تعمل إيه؟", c:[["توافق على كل حاجة",0],["ترفض، وتسأل كبير، لأن الكشاف مش محتاج كل ده",1],["توافق على الموقع بس",0]],
+  ok:"ذكية! لما التطبيق يطلب حاجات مالهاش علاقة بشغله، لازم نشك.",
+  no:"الكشاف مش محتاج ميكروفون ولا جهات اتصال. ارفضي واسألي كبير."}
+]},
+{id:"privacy", t:"إعدادات الخصوصية", ic:"⚙️", c:"#DDE6F0", qs:[
+ {set:"yard", cast:"ykm", h:"y", b:["y|h|عملت حساب جديد!","P|🌍|الحساب: عام|أي حد في الدنيا يشوف صورك ويبعتلك.","m|t|يعني أي حد خالص يقدر يكلمك؟","k|h|أحسن، كده هيبقى عندك متابعين كتير!"],
+  q:"يوسف يعمل إيه؟", c:[["يسيبه عام عشان ناس أكتر تشوفه",0],["يخليه خاص بمساعدة كبير",1],["يسيبه عام بس مايحطش صور",0]],
+  ok:"صح! الحساب الخاص بيخلي اللي يشوفك هما الناس اللي إنت موافق عليهم بس.",
+  no:"الحساب العام بيخلي أي حد يشوفك ويكلمك. الخاص أأمن بكتير."},
+ {set:"room", cast:"sn", h:"s", b:["s|h|نزّلت صور عيد ميلادي!","n|t|ومين يقدر يشوفها؟ ومين يقدر يبعتلك رسايل؟","s|t|مش عارفة… عمري ما فتحت الإعدادات."],
+  q:"سلمى تعمل إيه؟", c:[["مش مهم تعرف",0],["تراجع الإعدادات مع كبير وتخليها للأصحاب بس",1],["تمسح التطبيق كله",0]],
+  ok:"ممتاز! لازم تعرفي مين يشوف بوستاتك ومين يقدر يكلمك.",
+  no:"إعدادات الخصوصية بتحدد مين يشوفك ويكلمك. راجعيها مع كبير وخليها للأصحاب بس."}
+]},
+{id:"help", t:"أطلب مساعدة وأبلّغ", ic:"📣", c:"#FFF0B3", qs:[
+ {set:"yard", cast:"yk", h:"y", b:["k|t|مالك يا يوسف؟ ساكت من الصبح.","y|w|حصلت حاجة على النت ضايقتني… بس لو حكيت، بابا هياخد مني الموبايل.","k|t|طب هتعمل إيه؟"],
+  q:"يوسف يعمل إيه؟", c:[["يسكت ويحاول ينسى",0],["يحكي لكبير بيثق فيه، ولو ماسمعهوش يحكي لكبير تاني",1],["يحكي لكريم بس",0]],
+  ok:"إنت بطل! الحكي شجاعة، واللي حصل مش غلطك. لو أول كبير ماساعدكش، كمّل لحد ما حد يسمعك.",
+  no:"السكوت بيخلي المشكلة تكبر. احكي لكبير بتثق فيه، ولو ماسمعكش احكي لكبير تاني."},
+ {set:"class", cast:"snk", h:"s", b:["n|w|شفتوا الحساب اللي بيضايق أطفال الفصل؟","k|h|تعالوا نشتمه كلنا!","s|t|لأ… لازم نبلّغ، بس إزاي؟"],
+  q:"إزاي سلمى تبلّغ؟", c:[["ترد عليه وتشتمه",0],["تدوس «إبلاغ» في التطبيق، وتحكي لكبير، وتستخدم قنوات الشكوى في مركز التعلم",1],["تبعت الحساب لصحابها يهاجموه",0]],
+  ok:"برافو! زرار «إبلاغ» موجود في معظم التطبيقات. وكمان: "+HUB,
+  no:"الشتيمة والهجوم بيعملوا مشكلة أكبر. الصح: زرار «إبلاغ»، وتحكي لكبير. وكمان: "+HUB}
+]}
+];
+
+/* ---------- Backgrounds ---------- */
+const BG={
+ room:`<svg class="bgsvg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice"><rect width="400" height="400" fill="#FCE9D8"/><rect y="300" width="400" height="100" fill="#D9A877"/><rect y="296" width="400" height="8" fill="#B9845A"/>
+   <rect x="40" y="90" width="110" height="90" rx="6" fill="#BFE6FF" stroke="#fff" stroke-width="8"/><line x1="95" y1="90" x2="95" y2="180" stroke="#fff" stroke-width="5"/><circle cx="125" cy="115" r="12" fill="#FFE27A"/>
+   <rect x="260" y="200" width="120" height="100" rx="10" fill="#9CC9F0"/><rect x="250" y="190" width="140" height="22" rx="8" fill="#7FB3E3"/><rect x="290" y="60" width="70" height="56" rx="4" fill="#fff" stroke="#E8476A" stroke-width="4"/><path d="M300 104 L315 84 L328 98 L338 88 L352 104Z" fill="#7FE0AE"/></svg>`,
+ class:`<svg class="bgsvg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice"><rect width="400" height="400" fill="#FFF4D6"/><rect y="310" width="400" height="90" fill="#C9B79C"/>
+   <rect x="70" y="50" width="260" height="130" rx="6" fill="#2F6B4F" stroke="#A5713F" stroke-width="10"/><path d="M95 90 h70 M95 115 h110 M95 140 h50" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/><text x="260" y="135" font-size="34" fill="#fff" opacity=".85" font-family="sans-serif">٢+٣</text>
+   <rect x="20" y="250" width="90" height="12" fill="#A5713F"/><rect x="290" y="250" width="90" height="12" fill="#A5713F"/><rect x="28" y="262" width="8" height="50" fill="#8A5B30"/><rect x="94" y="262" width="8" height="50" fill="#8A5B30"/><rect x="298" y="262" width="8" height="50" fill="#8A5B30"/><rect x="364" y="262" width="8" height="50" fill="#8A5B30"/></svg>`,
+ yard:`<svg class="bgsvg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice"><rect width="400" height="400" fill="#BFE6FF"/><circle cx="340" cy="60" r="30" fill="#FFE27A"/><ellipse cx="90" cy="70" rx="45" ry="16" fill="#fff"/><ellipse cx="230" cy="45" rx="35" ry="12" fill="#fff"/>
+   <rect y="290" width="400" height="110" fill="#8FD47E"/><path d="M0 290 Q100 270 200 290 T400 290 V300 H0Z" fill="#7CC56B"/>
+   <rect x="40" y="180" width="18" height="115" fill="#8A5B30"/><circle cx="49" cy="170" r="45" fill="#4FB06A"/><circle cx="20" cy="190" r="28" fill="#5FC27A"/>
+   <g stroke="#fff" stroke-width="6"><line x1="250" y1="250" x2="400" y2="250"/><line x1="250" y1="272" x2="400" y2="272"/></g><g fill="#fff"><rect x="255" y="235" width="8" height="58"/><rect x="300" y="235" width="8" height="58"/><rect x="345" y="235" width="8" height="58"/><rect x="390" y="235" width="8" height="58"/></g></svg>`,
+ home:`<svg class="bgsvg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice"><rect width="400" height="400" fill="#E4F1E6"/><rect y="305" width="400" height="95" fill="#E2C9A6"/>
+   <rect x="110" y="190" width="180" height="70" rx="20" fill="#E8476A"/><rect x="95" y="215" width="210" height="70" rx="18" fill="#F06A86"/><rect x="100" y="285" width="10" height="20" fill="#8A5B30"/><rect x="290" y="285" width="10" height="20" fill="#8A5B30"/>
+   <rect x="30" y="70" width="70" height="90" rx="4" fill="#fff" stroke="#A5713F" stroke-width="6"/><circle cx="65" cy="105" r="16" fill="#FFC93C"/><path d="M40 150 Q65 120 90 150Z" fill="#7FE0AE"/>
+   <line x1="350" y1="120" x2="350" y2="300" stroke="#16324F" stroke-width="5"/><path d="M325 120 h50 l-12 -40 h-26Z" fill="#FFC93C"/></svg>`
+};
+
+/* ---------- Characters ---------- */
+const LOOK={
+ s:{skin:"#F2C29B", shirt:"#E8476A", hair:`<circle cx="22" cy="58" r="12" fill="#5A3825"/><circle cx="98" cy="58" r="12" fill="#5A3825"/><path d="M24 58 C24 22 96 22 96 58 C88 40 32 40 24 58Z" fill="#5A3825"/><circle cx="84" cy="32" r="6" fill="#FFC93C"/>`},
+ n:{skin:"#E9B48C", shirt:"#7D5BD6", hijab:true},
+ y:{skin:"#F2C29B", shirt:"#2B7FD9", hair:`<path d="M25 56 C22 20 98 20 95 56 C86 38 34 36 25 56Z" fill="#2F2A26"/>`},
+ k:{skin:"#F5CDA7", shirt:"#F28C28", hair:`<path d="M24 58 C20 18 100 18 96 58 C92 44 70 30 60 40 C50 30 28 44 24 58Z" fill="#8A5B30"/>`, glasses:true},
+ m:{skin:"#C88B5E", shirt:"#1FA39A", hair:`<g fill="#1E1A17"><circle cx="34" cy="38" r="11"/><circle cx="50" cy="28" r="12"/><circle cx="70" cy="28" r="12"/><circle cx="86" cy="38" r="11"/><circle cx="26" cy="52" r="9"/><circle cx="94" cy="52" r="9"/></g>`}
+};
+function charSVG(code){
+  const L=LOOK[code];
+  const back = L.hijab ? `<path d="M14 66 C14 14 106 14 106 66 L112 118 H8Z" fill="#3FA37C"/>` : "";
+  const front = L.hijab ? `<path d="M24 62 C24 26 96 26 96 62 C96 40 24 40 24 62Z" fill="#3FA37C"/>` : L.hair;
+  const glasses = L.glasses ? `<g fill="none" stroke="#16324F" stroke-width="3"><circle cx="47" cy="62" r="9"/><circle cx="73" cy="62" r="9"/><line x1="56" y1="62" x2="64" y2="62"/></g>` : "";
+  return `<svg viewBox="0 0 120 165" class="mood-h" aria-hidden="true">${back}
+    <rect x="20" y="100" width="80" height="70" rx="30" fill="${L.shirt}"/>
+    <rect x="52" y="90" width="16" height="16" fill="${L.skin}"/>
+    <circle cx="60" cy="60" r="35" fill="${L.skin}"/>${front}
+    <circle cx="47" cy="62" r="4.5" fill="#16324F"/><circle cx="73" cy="62" r="4.5" fill="#16324F"/>${glasses}
+    <path class="brow" d="M39 53 L52 47 M81 53 L68 47" stroke="#16324F" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="37" cy="75" r="5" fill="#F7A08A" opacity=".6"/><circle cx="83" cy="75" r="5" fill="#F7A08A" opacity=".6"/>
+    <path class="m mh" d="M48 78 Q60 90 72 78" stroke="#16324F" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path class="m mw" d="M49 86 Q60 77 71 86" stroke="#16324F" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path class="m mt" d="M52 83 L69 80" stroke="#16324F" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <ellipse class="mo" cx="60" cy="82" rx="7" ry="6" fill="#16324F"/></svg>`;
+}
+
+/* ---------- Progress storage ---------- */
+const KEY="dir3-progress-v2";
+let prog={}; try{ prog=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ prog={}; }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(prog)); }catch(e){} }
+const $=id=>document.getElementById(id);
+const ar=n=>String(n).replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]);
+const TOTAL=T.reduce((s,t)=>s+t.qs.length,0);
+function show(id){ ["mapS","playS","endS"].forEach(s=>$(s).hidden=s!==id); window.scrollTo(0,0); }
+
+/* ---------- Map ---------- */
+function renderMap(){
+  stopVideo();
+  const got=T.reduce((s,t)=>s+(prog[t.id]||0),0);
+  $("total").textContent=`⭐ ${ar(got)} من ${ar(TOTAL)}`;
+  $("grid").innerHTML="";
+  T.forEach((t,k)=>{
+    const b=document.createElement("button"), done=prog[t.id]!==undefined;
+    b.className="station"+(done?" done":""); b.style.setProperty("--tc",t.c);
+    b.innerHTML=`<span class="ic" aria-hidden="true">${t.ic}</span><span class="tt"></span><span class="st"></span>`;
+    b.querySelector(".tt").textContent=t.t;
+    b.querySelector(".st").textContent=done?`⭐ ${ar(prog[t.id])} / ${ar(t.qs.length)}`:`${ar(t.qs.length)} مواقف`;
+    b.onclick=()=>openTopic(k); $("grid").appendChild(b);
+  });
+  const all=T.every(t=>prog[t.id]!==undefined);
+  $("certBtn").disabled=!all; $("certHint").textContent=all?"":"خلّص كل المحطات عشان تفتح شهادتك.";
+  show("mapS");
+}
+$("reset").onclick=()=>{ if(confirm("متأكد؟ كل النجوم هتتمسح.")){ prog={}; save(); renderMap(); } };
+$("certBtn").onclick=openCert; $("back").onclick=renderMap; $("back2").onclick=renderMap;
+
+/* ---------- Voice ---------- */
+const canSpeak=("speechSynthesis" in window)&&("SpeechSynthesisUtterance" in window);
+let voiceOn=true, arVoice=null, spoke=false;
+function pickVoice(){ try{ const v=speechSynthesis.getVoices(); arVoice=v.find(x=>/^ar[-_]EG/i.test(x.lang))||v.find(x=>/^ar/i.test(x.lang))||null; }catch(e){ arVoice=null; } updVoice(); }
+if(canSpeak){ pickVoice(); try{ speechSynthesis.addEventListener("voiceschanged",pickVoice); }catch(e){} }
+function updVoice(){
+  $("voice").textContent = voiceOn&&canSpeak ? "🔊" : "🔇";
+  const note=$("vnote");
+  if(!canSpeak){ note.hidden=false; note.textContent="المتصفح ده مش بيدعم الصوت. جرّب تفتح اللعبة في Chrome أو Safari، والمشاهد شغالة بالكلام المكتوب."; }
+  else note.hidden=true;
+}
+$("voice").onclick=()=>{ voiceOn=!voiceOn; if(!voiceOn&&canSpeak) try{speechSynthesis.cancel();}catch(e){} updVoice(); };
+const clean=s=>s.replace(/[\p{Extended_Pictographic}\uFE0F\u200D«»]/gu,"").trim();
+function speak(text,who,done){
+  try{
+    if(speechSynthesis.speaking||speechSynthesis.pending) speechSynthesis.cancel();
+    speechSynthesis.resume();
+    const u=new SpeechSynthesisUtterance(clean(text));
+    if(arVoice){ u.voice=arVoice; u.lang=arVoice.lang; } else u.lang="ar-EG";
+    u.rate=.95; u.pitch=PITCH[who]||1;
+    u.onstart=()=>{ spoke=true; };
+    u.onend=done; u.onerror=done;
+    speechSynthesis.speak(u);
+  }catch(e){ done(); }
+}
+
+/* ---------- Scene player ---------- */
+let cur=null, beats=[], bi=0, timer=null, playing=false, chars={}, xs={};
+function setupVideo(q){
+  stopVideo(); cur=q; beats=q.b.map(s=>s.split("|")); bi=0;
+  $("bg").innerHTML=BG[q.set];
+  const cast=q.cast.split(""), pos=cast.length===3?[18,50,82]:[27,73], w=cast.length===3?24:29;
+  $("cast").innerHTML=""; chars={}; xs={};
+  cast.forEach((c,i)=>{
+    const d=document.createElement("div"); d.className="chr"; d.style.left=pos[i]+"%"; d.style.width=w+"%";
+    d.innerHTML=`<span class="tag"></span>${charSVG(c)}`; d.querySelector(".tag").textContent=NAMES[c];
+    $("cast").appendChild(d); chars[c]=d; xs[c]=pos[i];
+  });
+  $("top").innerHTML=""; $("cap").hidden=true;
+  $("prog").innerHTML=beats.map(()=>"<i></i>").join("");
+  $("overlay").hidden=false; $("pp").textContent="▶"; $("qa").hidden=true;
+}
+function quiet(){ Object.values(chars).forEach(d=>{ d.classList.remove("speaking"); d.querySelector("svg").classList.remove("talk"); }); }
+function stopVideo(){ playing=false; clearTimeout(timer); if(canSpeak) try{speechSynthesis.cancel();}catch(e){} if(typeof clipEl!=="undefined"&&clipEl){ try{clipEl.onended=null; clipEl.onerror=null; clipEl.pause();}catch(e){} clipEl=null; } quiet(); }
+function play(){ $("overlay").hidden=true; playing=true; $("pp").textContent="⏸"; step(); }
+$("overlay").onclick=play;
+$("pp").onclick=()=>{ if(playing){ stopVideo(); $("pp").textContent="▶"; } else { if(bi>=beats.length) restart(); else play(); } };
+$("replay").onclick=restart;
+function restart(){ const keep=!$("qa").hidden; setupVideo(cur); if(keep) $("qa").hidden=false; play(); }
+function setCap(who,text){ const c=$("cap"); c.hidden=false; c.innerHTML=`<span class="who"></span><span class="tx"></span>`; c.querySelector(".who").textContent=who+":"; c.querySelector(".tx").textContent=text; }
+
+function step(){
+  if(!playing) return;
+  if(bi>=beats.length){ endVideo(); return; }
+  const b=beats[bi], k=b[0];
+  [...$("prog").children].forEach((x,i)=>x.classList.toggle("on",i<=bi));
+  quiet(); $("cap").hidden=true; $("top").innerHTML="";
+  let say="", who="N";
+  if(k==="N"){ setCap("الراوي",b[1]); say=b[1]; }
+  else if(k==="O"){
+    const hero=NAMES[cur.h];
+    $("top").innerHTML=`<div class="phone"><div class="ph"></div><div class="pb"></div></div>`;
+    $("top").querySelector(".ph").textContent="📩 "+b[1]; $("top").querySelector(".pb").textContent=b[2];
+    chars[cur.h]?.querySelector("svg").setAttribute("class","mood-t");
+    setCap("رسالة جت لـ"+hero, "من «"+b[1]+"»"); say="رسالة من "+b[1]+". "+b[2];
+  }
+  else if(k==="P"){
+    $("top").innerHTML=`<div class="phone"><div class="ph"></div><div class="pb"><div class="pe"></div><div class="pl"></div></div></div>`;
+    $("top").querySelector(".ph").textContent="📱 "+b[2]; $("top").querySelector(".pe").textContent=b[1]; $("top").querySelector(".pl").textContent=b[2];
+    setCap("الراوي",b[3]); say=b[3];
+  }
+  else if(chars[k]){
+    who=k; const d=chars[k], svg=d.querySelector("svg");
+    svg.setAttribute("class","mood-"+b[1]+" talk"); d.classList.add("speaking");
+    const x=Math.min(Math.max(xs[k],29),71);
+    const bub=document.createElement("div"); bub.className="bub"; bub.style.left=x+"%";
+    bub.style.setProperty("--tail", (50+(xs[k]-x)*1.6)+"%");
+    bub.innerHTML="<b></b><span></span>"; bub.querySelector("b").textContent=NAMES[k]; bub.querySelector("span").textContent=b[2];
+    $("top").appendChild(bub); say=b[2];
+  }
+  const dur=Math.max(2800, 1000+clean(say).length*80);
+  let fired=false;
+  const next=()=>{ if(fired) return; fired=true; clearTimeout(timer); if(!playing) return;
+    if(chars[who]) chars[who].querySelector("svg").classList.remove("talk");
+    timer=setTimeout(()=>{ bi++; step(); },500); };
+  const tts=()=>{ if(voiceOn&&canSpeak){ speak(say,who,next); timer=setTimeout(next, spoke?dur+6000:dur); } else timer=setTimeout(next,dur); };
+  playClip(`audio/${T[ti].id}-${qi+1}-${bi+1}.mp3`, tts, next);
+}
+/* Recorded voices: put files in an "audio" folder next to index.html, named topic-question-line.mp3 (e.g. pass-1-2.mp3). Missing files fall back to the device voice. */
+let clipEl=null; const missing=new Set();
+function playClip(src,fallback,done){
+  if(!voiceOn||missing.has(src)) return fallback();
+  let settled=false;
+  const fb=()=>{ if(settled) return; settled=true; missing.add(src); fallback(); };
+  try{
+    if(canSpeak) try{speechSynthesis.cancel();}catch(e){}
+    clipEl=new Audio(src);
+    clipEl.onended=()=>done();
+    clipEl.onerror=fb;
+    const p=clipEl.play();
+    if(p&&p.then) p.then(()=>{ settled=true; clearTimeout(timer); timer=setTimeout(done,60000); }).catch(fb);
+  }catch(e){ fb(); }
+}
+function endVideo(){ playing=false; $("pp").textContent="▶"; quiet(); if($("qa").hidden) showQuestion(); }
+
+/* ---------- Topic flow ---------- */
+let ti=0, qi=0, score=0;
+function openTopic(k){
+  ti=k; qi=0; score=0; const t=T[ti];
+  $("tTitle").textContent=t.ic+" "+t.t;
+  $("topicEnd").hidden=true; $("stage").hidden=false; document.querySelector(".ctrls").hidden=false;
+  show("playS"); loadQ();
+}
+function dots(){ $("dots").innerHTML=T[ti].qs.map((_,k)=>`<span class="dot ${k<qi?'done':k===qi?'now':''}"></span>`).join(""); }
+function loadQ(){ dots(); setupVideo(T[ti].qs[qi]); $("fb").innerHTML=""; $("next").hidden=true; }
+function showQuestion(){
+  const q=cur; $("question").textContent=q.q;
+  const opts=q.c.map(x=>x.slice()).sort(()=>Math.random()-.5);
+  $("choices").innerHTML="";
+  opts.forEach(([txt,good])=>{
+    const b=document.createElement("button"); b.className="choice"; b.dataset.good=good;
+    const s=document.createElement("span"); s.dir="auto"; s.textContent=txt; b.appendChild(s);
+    b.onclick=()=>pick(b,good); $("choices").appendChild(b);
+  });
+  $("fb").innerHTML=""; $("next").hidden=true; $("qa").hidden=false;
+  setTimeout(()=>$("question").scrollIntoView({behavior:"smooth",block:"start"}),150);
+}
+function pick(btn,good){
+  stopVideo();
+  document.querySelectorAll(".choice").forEach(b=>{ b.disabled=true; if(b.dataset.good==="1") b.classList.add("right"); });
+  if(!good) btn.classList.add("wrong"); else score++;
+  const fb=document.createElement("div"); fb.className="feedback "+(good?"good":"bad");
+  fb.innerHTML=`<div class="fi" aria-hidden="true">${good?"🛡️":"💡"}</div><div><h3></h3><p></p></div>`;
+  fb.querySelector("h3").textContent=good?"إجابة صح! ⭐":"فكّر تاني معايا";
+  fb.querySelector("p").textContent=good?cur.ok:cur.no;
+  $("fb").innerHTML=""; $("fb").appendChild(fb);
+  playClip(`audio/${T[ti].id}-${qi+1}-${good?"ok":"no"}.mp3`, ()=>{ if(voiceOn&&canSpeak) speak((good?"إجابة صح! ":"")+(good?cur.ok:cur.no),"N",()=>{}); }, ()=>{});
+  $("next").textContent= qi===T[ti].qs.length-1 ? "شوف نتيجة المحطة" : "الموقف اللي بعده";
+  $("next").hidden=false; $("next").focus();
+}
+$("next").onclick=()=>{ if(canSpeak) try{speechSynthesis.cancel();}catch(e){} qi++; if(qi<T[ti].qs.length){ loadQ(); window.scrollTo(0,0); } else topicDone(); };
+function topicDone(){
+  const t=T[ti], n=t.qs.length;
+  prog[t.id]=Math.max(prog[t.id]||0,score); save();
+  $("qa").hidden=true; $("stage").hidden=true; document.querySelector(".ctrls").hidden=true; $("vnote").hidden=true;
+  qi=n; dots();
+  $("teIcon").textContent= score===n?"🏆":score>=n-1?"🌟":"💪";
+  $("teTitle").textContent= score===n?"محطة كاملة يا بطل!":score>=n-1?"شغل جامد!":"إنت بتتعلم، وده المهم";
+  $("teScore").textContent=`جمعت ${ar(score)} نجمة من ${ar(n)} في «${t.t}»`;
+  const nextIdx=T.findIndex((x,k)=>k>ti && prog[x.id]===undefined);
+  $("teBack").textContent = nextIdx>=0 ? "المحطة اللي بعدها" : "ارجع للمحطات";
+  $("teBack").onclick = ()=> nextIdx>=0 ? openTopic(nextIdx) : renderMap();
+  $("topicEnd").hidden=false; window.scrollTo(0,0);
+}
+$("teAgain").onclick=()=>openTopic(ti);
+
+/* ---------- Certificate ---------- */
+function openCert(){
+  const got=T.reduce((s,t)=>s+(prog[t.id]||0),0), pct=got/TOTAL;
+  const lvl= pct>=.9?["🥇","درع ذهبي"]: pct>=.7?["🥈","درع فضي"]:["🥉","درع برونزي"];
+  $("badge").textContent=lvl[0];
+  $("certLevel").textContent=`حصل على ${lvl[1]} و${ar(got)} نجمة من ${ar(TOTAL)} ⭐`;
+  $("certDate").textContent=new Date().toLocaleDateString("ar-EG",{year:"numeric",month:"long",day:"numeric"});
+  $("certName").textContent=$("kidName").value.trim()||"…";
+  $("hubText").textContent=HUB+" وماتنساش زرار «إبلاغ» في التطبيق.";
+  show("endS");
+}
+$("kidName").oninput=e=>$("certName").textContent=e.target.value.trim()||"…";
+$("printBtn").onclick=()=>{ try{ window.print(); }catch(e){} };
+updVoice(); renderMap();
+</script>
+</body>
+</html>
